@@ -1,0 +1,11 @@
+Column(
+    mainAxisSize: MainAxisSize.min,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: <Widget>[
+        SizedBox(
+        height: 100.0,
+        width: 100.0,
+        child: LinearProgressIndicator(),
+        ),
+    ],
+    );
