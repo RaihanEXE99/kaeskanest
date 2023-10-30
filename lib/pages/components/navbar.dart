@@ -48,6 +48,7 @@ class Navbar extends StatelessWidget {
               ),
             title: const Text('About'),
             onTap: ()=> {
+              Navigator.pushNamed(context, "/about")
             },
           ),
           ListTile(
@@ -67,6 +68,7 @@ class Navbar extends StatelessWidget {
               ),
             title: const Text('Contact'),
             onTap: ()=> {
+              Navigator.pushNamed(context, "/contact")
             },
           ),
           ListTile(

@@ -63,7 +63,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // _getLocationPermission();
     _getCurrentPosition();
   }
 
@@ -102,7 +101,6 @@ class _HomePageState extends State<HomePage> {
     ));
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      print(jsonResponse);
       return {
         'lat':jsonResponse['result']['geometry']['location']['lat'],
         'long':jsonResponse['result']['geometry']['location']['lng']
@@ -126,10 +124,12 @@ class _HomePageState extends State<HomePage> {
     final loc = await Permission.location.request();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      // Set the current position as a LatLng object
-      _currentPosition = LatLng(position.latitude, position.longitude);
-    });
+    if (mounted){
+      setState(() {
+        // Set the current position as a LatLng object
+        _currentPosition = LatLng(position.latitude, position.longitude);
+      });
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) {

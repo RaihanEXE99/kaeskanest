@@ -40,9 +40,11 @@ class _UserNavBarState extends State<UserNavBar> {
       );
       if (response.statusCode>=400){
         await secureStorage.deleteAll();
-        setState(() {
-          token=null;
-        });
+        if(mounted){
+          setState(() {
+            token=null;
+          });
+        }
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => Login(), // Replace with your login screen
@@ -53,11 +55,13 @@ class _UserNavBarState extends State<UserNavBar> {
       else{
         final Map<String, dynamic> responseData = json.decode(response.body);
 
-        setState(() {
-          userName = responseData['full_name'];
-          userEmail = responseData['email'];
-          hasToken = true;
-        });
+        if(mounted){
+          setState(() {
+            userName = responseData['full_name'];
+            userEmail = responseData['email'];
+            hasToken = true;
+          });
+        }
         return true;
       }
     } else {
@@ -145,6 +149,7 @@ class _UserNavBarState extends State<UserNavBar> {
               ),
             title: const Text('Profile Settings'),
             onTap: ()=> {
+              Navigator.pushNamed(context, "/profileSettings")
             },
           ),
           ListTile(
