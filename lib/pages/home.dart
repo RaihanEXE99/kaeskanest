@@ -117,9 +117,11 @@ class _HomePageState extends State<HomePage> {
   
   void _getCurrentPosition() async {
     final tmpImg = await getBytesFromAsset('assets/map/boy.png', 125);
-    setState(() {
-      markerIcon=tmpImg;
-    });
+    if(mounted){
+      setState(() {
+        markerIcon=tmpImg;
+      });
+    }
     // Get the current position using geolocator package
     final loc = await Permission.location.request();
     Position position = await Geolocator.getCurrentPosition(

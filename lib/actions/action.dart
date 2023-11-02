@@ -27,3 +27,7 @@ Future <bool> CHECKVALIDUSER() async{
     return false;
   }
 }
+Future deleteAllFromSS() async {
+  final secureStorage = FlutterSecureStorage();
+  await secureStorage.deleteAll();
+}

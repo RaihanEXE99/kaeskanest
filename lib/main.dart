@@ -4,6 +4,7 @@ import 'package:realestate/pages/navbar/about.dart';
 import 'package:realestate/pages/navbar/contact.dart';
 import 'package:realestate/pages/navbar/propertyList.dart';
 import 'package:realestate/pages/userNav/login.dart';
+import 'package:realestate/pages/userNav/organizationSettings.dart';
 import 'package:realestate/pages/userNav/profileSettings.dart';
 import 'package:realestate/pages/userNav/register.dart';
 import 'package:realestate/pages/userNav/settigns.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/settings':(context) => Settings(),
         "/propertyList":(context)=> MapScreen(),
         "/profileSettings":(context)=> ProfileSettings(),
+        "/organizationSettings":(context)=> OrganizationSettings(),
         "/about":(context)=> About(),
         "/contact":(context)=> Contact(),
       },

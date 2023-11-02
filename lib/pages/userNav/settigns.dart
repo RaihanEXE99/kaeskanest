@@ -33,11 +33,6 @@ class _SettingsState extends State<Settings> {
   void initState() {
     super.initState();
   }
-  // @override
-  // void dispose() {
-  //   userNameController.dispose();
-  //   super.dispose();
-  // }
   Future<bool> _checkAccessTokenOnce() async {
     var token = await secureStorage.read(key: 'access');
     if (token != null) {
@@ -90,6 +85,7 @@ class _SettingsState extends State<Settings> {
         child: DefaultAppBar(title:"Settings")
         ),
       body: FutureBuilder<bool>(
+        key: UniqueKey() ,
         future: _checkAccessTokenFuture,
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) { 
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -115,7 +111,8 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                     ),
-                  ),  
+                  ), 
+                   
                   Padding(
                     padding: const EdgeInsets.only(left:20,right: 20,top:20),
                     child: Card(
@@ -251,6 +248,7 @@ class _SettingsState extends State<Settings> {
                       ),
                     ),
                   ),
+                  
                   Padding(
                     padding: const EdgeInsets.only(left:20,right: 20,top:20),
                     child: Card(

@@ -340,19 +340,35 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> _loginUser() async {
+    Future<http.Response> createJwtToken(String email, String password) async {
+      final url = Uri.parse("https://" + globals.apiUrl + '/api/jwt/create/');
+      final headers = {
+        'Content-Type': 'application/json',
+      };
+      final body = jsonEncode({
+        'email': email,
+        'password': password,
+      });
+      final response = await http.post(url, headers: headers, body: body);
+      return response;
+    }
     setState(() {
       onLoadState = true;
     });
-    final response = await http.post(
-      Uri.parse("https://"+globals.apiUrl+'/api/jwt/create/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': emailController.text,
-        'password': passwordController.text,
-      })
-    );
+    // final response = await http.post(
+    //   Uri.parse("https://"+globals.apiUrl+'/api/jwt/create/'),
+    //   headers: <String, String>{
+    //     'Content-Type': 'application/json; charset=UTF-8',
+    //   },
+    //   body: jsonEncode(<String, String>{
+    //     'email': emailController.text,
+    //     'password': passwordController.text,
+    //   })
+    // );
+    final email = emailController.text;
+    final password = passwordController.text;
+
+    final response = await createJwtToken(email, password);
 
     if (response.statusCode < 303) {
       final Map<String, dynamic> responseData = json.decode(response.body);
