@@ -3,6 +3,9 @@ import 'package:realestate/pages/home.dart';
 import 'package:realestate/pages/navbar/about.dart';
 import 'package:realestate/pages/navbar/contact.dart';
 import 'package:realestate/pages/navbar/propertyList.dart';
+import 'package:realestate/pages/userNav/addAgent.dart';
+import 'package:realestate/pages/userNav/agentSettings.dart';
+import 'package:realestate/pages/userNav/invitations.dart';
 import 'package:realestate/pages/userNav/login.dart';
 import 'package:realestate/pages/userNav/organizationSettings.dart';
 import 'package:realestate/pages/userNav/profileSettings.dart';
@@ -46,6 +49,9 @@ class MyApp extends StatelessWidget {
         "/propertyList":(context)=> MapScreen(),
         "/profileSettings":(context)=> ProfileSettings(),
         "/organizationSettings":(context)=> OrganizationSettings(),
+        "/agentSettings":(context)=> AgentSettings(),
+        "/addAgent":(context)=> AddAgent(),
+        "/invitations":(context)=> Invitations(),
         "/about":(context)=> About(),
         "/contact":(context)=> Contact(),
       },

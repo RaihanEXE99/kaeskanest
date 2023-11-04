@@ -187,12 +187,32 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
             ...[
             if(role=='3')ListTile(
               leading: Icon(
-                Icons.house_outlined,
+                Icons.supervised_user_circle_outlined,
                 color: Theme.of(context).colorScheme.primary,
                 ),
               title: const Text('Organization Settings'),
               onTap: ()=> {
                 Navigator.pushNamed(context, "/organizationSettings")
+              },
+            ),
+            if(role=='2')ListTile(
+              leading: Icon(
+                Icons.supervised_user_circle_outlined,
+                color: Theme.of(context).colorScheme.primary,
+                ),
+              title: const Text('Agent Settings'),
+              onTap: ()=> {
+                Navigator.pushNamed(context, "/agentSettings")
+              },
+            ),
+            if(role=='2')ListTile(
+              leading: Icon(
+                Icons.notifications,
+                color: Theme.of(context).colorScheme.primary,
+                ),
+              title: const Text('Invitations'),
+              onTap: ()=> {
+                Navigator.pushNamed(context, "/invitations")
               },
             ),
               ListTile(
@@ -220,6 +240,7 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
                 ),
               title: const Text('Add Agent'),
               onTap: ()=> {
+                Navigator.pushNamed(context, "/addAgent")
               },
             ),
             ListTile(

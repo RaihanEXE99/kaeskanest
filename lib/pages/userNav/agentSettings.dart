@@ -10,31 +10,22 @@ import 'package:realestate/pages/userNav/login.dart';
 
 import 'package:http/http.dart'as http;
 
-class ProfileSettings extends StatefulWidget {
-  const ProfileSettings({super.key});
+class AgentSettings extends StatefulWidget {
+  const AgentSettings({super.key});
 
   @override
-  State<ProfileSettings> createState() => _ProfileSettingsState();
+  State<AgentSettings> createState() => _AgentSettingsState();
 }
 
-class _ProfileSettingsState extends State<ProfileSettings> {
+class _AgentSettingsState extends State<AgentSettings> {
   final secureStorage = FlutterSecureStorage();
   bool hasToken = false;
-  bool passwordVisible=false;
-  bool onLoadState=false;
+  bool onLoadState =false;
   late final Future<bool> _checkAccessTokenFuture = _checkAccessTokenOnce();
 
   final TextEditingController pname = TextEditingController();
-  final TextEditingController pnumber = TextEditingController();
+  final TextEditingController pphone = TextEditingController();
   final TextEditingController pemail = TextEditingController();
-  final TextEditingController pskype = TextEditingController();
-  
-  final TextEditingController pfb = TextEditingController();
-  final TextEditingController pli = TextEditingController();
-  final TextEditingController ptitle = TextEditingController();
-  final TextEditingController pwebsite = TextEditingController();
-  final TextEditingController ptwitter = TextEditingController();
-  final TextEditingController pint = TextEditingController();
   final TextEditingController pdes = TextEditingController();
 
   late final String rtitle;
@@ -69,17 +60,10 @@ class _ProfileSettingsState extends State<ProfileSettings> {
       }
       else{
         final Map<String, dynamic> responseData = json.decode(response.body);
-        // final gresponse = await http.get(
-        // Uri.parse("https://" + globals.apiUrl + '/api/profiles/'+responseData['id'].toString()+'/'),
-        //   headers: <String, String>{
-        //     'Content-Type': 'application/json; charset=UTF-8',
-        //     'Authorization': 'JWT $token',
-        //   },
-        // );
         Future<http.Response> fetchProfileData(String token) async {
-          final url = Uri.parse("https://" + globals.apiUrl + '/api/profile/details/');
+          final url = Uri.parse("https://" + globals.apiUrl + '/api/agent/profile/');
           final headers = {
-            'Content-Type': 'application/json; charset=UTF-8',
+            'Content-Type': 'application/json',
             'Authorization': 'JWT $token',
           };
 
@@ -90,7 +74,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
         if (response.statusCode>=400){
           await secureStorage.deleteAll();
           setState(() {
-            token=null;
+            // token=null;
           });
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -104,17 +88,10 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           setState(() {
             userId = responseData['id'];
             hasToken = true;
-            pname.text = gresponseData['name'];
-            pnumber.text = gresponseData['number'];
-            pemail.text = gresponseData['email'];
-            pskype.text = gresponseData['skype_link'];
-            pfb.text = gresponseData['facebook_link'];
-            pli.text = gresponseData['linkedin_link'];
-            ptitle.text = gresponseData['title'];
-            pwebsite.text = gresponseData['website'];
-            ptwitter.text = gresponseData['twitter'];
-            pint.text = gresponseData['pinterest'];
-            pdes.text = gresponseData['description'];
+            pname.text = gresponseData['name']??"";
+            pphone.text = gresponseData['phone']??"";
+            pemail.text = gresponseData['email']??"";
+            pdes.text = gresponseData['about']??"";
           });
           return true;
         }
@@ -136,7 +113,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
       endDrawer: const UserNavBar(),
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: DefaultAppBar(title:"Profile Settings")
+        child: DefaultAppBar(title:"Agent Settings")
         ),
       body: FutureBuilder<bool>(
         key:  UniqueKey() ,
@@ -155,7 +132,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                     padding: const EdgeInsets.only(top:25),
                     child: Center(
                       child: Text(
-                        "Profile Settings",
+                        "Agent Settings",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontSize: 30,
@@ -179,22 +156,15 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                         child: Column(
                           crossAxisAlignment:CrossAxisAlignment.stretch,
                           children: [
-                            profileSettingsRow(property: pname,rtitle:"Name",rtype:"name"),
-                            profileSettingsRow(property: pnumber,rtitle:"Number",rtype:"phone"),
-                            profileSettingsRow(property: pemail,rtitle:"Email",rtype:"email"),
-                            profileSettingsRow(property: ptitle,rtitle:"Title",rtype:"name"),
-                            profileSettingsRow(property: pskype,rtitle:"Skype",rtype:"url"),
-                            profileSettingsRow(property: pfb,rtitle:"Facebook",rtype:"url"),
-                            profileSettingsRow(property: pli,rtitle:"Linkedin",rtype:"url"),
-                            profileSettingsRow(property: pwebsite,rtitle:"Website",rtype:"url"),
-                            profileSettingsRow(property: ptwitter,rtitle:"Twitter",rtype:"url"),
-                            profileSettingsRow(property: pint,rtitle:"Pinterest",rtype:"url"),
-                            profileSettingsRow(property: pdes,rtitle:"Description",rtype:"mul"),
+                            AgentSettingsRow(property: pname,rtitle:"Agent Name",rtype:"name"),
+                            AgentSettingsRow(property: pemail,rtitle:"Email",rtype:"email"),
+                            AgentSettingsRow(property: pphone,rtitle:"Contact No",rtype:"phone"),
+                            AgentSettingsRow(property: pdes,rtitle:"About",rtype:"mul"),
                             SizedBox(
                               width: 220,
                               child: ElevatedButton(
                                 onPressed: ()=>{
-                                  _upateProfileSettings()
+                                  _upateAgentSettings()
                                 },
                                 style: ElevatedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
@@ -203,8 +173,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.only(top:13,bottom: 13),
-                                  child:onLoadState?Container(width: 30,height: 5,child: LinearProgressIndicator()):
-                                   Text(
+                                  child: onLoadState?Container(width: 30,height: 5,child: LinearProgressIndicator()):Text(
                                     "Update",
                                     style: TextStyle(
                                       color: Colors.white
@@ -229,31 +198,36 @@ class _ProfileSettingsState extends State<ProfileSettings> {
       ),
     );
   }
-  Future _upateProfileSettings() async {
+  Future _upateAgentSettings() async {
     final token = await secureStorage.read(key: 'access');
-    setState(() {onLoadState=true;});
+    print("Process Started:");
+    setState(() {
+      onLoadState = true;
+    });
     final response = await http.post(
-      Uri.parse("https://"+globals.apiUrl+'/api/profile/update/'),
+      Uri.parse("https://"+globals.apiUrl+'/api/agent/profile/update/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'JWT $token',
       },
       body: jsonEncode(<String, String>{
         "name": pname.text,
-        "number": pnumber.text,
-        "skype_link": pskype.text,
-        "facebook_link": pfb.text,
-        "linkedin_link": pli.text,
-        "title": ptitle.text,
+        "phone": pphone.text,
         "email": pemail.text,
-        "website": pwebsite.text,
-        "twitter": ptwitter.text,
-        "pinterest": pint.text,
         "description": pdes.text 
     })
-    ).whenComplete(() => setState(() {onLoadState=false;}));
+    );
+    setState(() {
+      onLoadState = false;
+    });
+    print({
+        "name": pname.text,
+        "phone": pphone.text,
+        "email": pemail.text,
+        "description": pdes.text 
+    });
     if (response.statusCode < 303) {
-      return _showPopUpDialog("","Profile settings updated successfully.",context);
+      return _showPopUpDialog("","Agent settings updated successfully.");
     }
     else if(response.statusCode == 400){
       final Map<String, dynamic> responseData = json.decode(response.body);
@@ -284,7 +258,6 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     }
      else {
       final Map<String, dynamic> responseData = json.decode(response.body);
-      print(responseData);
       return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -294,8 +267,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(responseData['error']??"Internal Error!"),
-                Text(response.statusCode.toString()),
+                Text(responseData['error']),
               ],
             ),
           ),
@@ -313,7 +285,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     }
   }
 
-  Future _showPopUpDialog(String type,String bodyTXT, BuildContext context) {
+  Future _showPopUpDialog(String type,String bodyTXT) {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -366,8 +338,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
   // }
 }
 
-class profileSettingsRow extends StatelessWidget {
-  const profileSettingsRow({
+class AgentSettingsRow extends StatelessWidget {
+  const AgentSettingsRow({
     super.key,
     required this.property, required String this.rtitle,required this.rtype
   });

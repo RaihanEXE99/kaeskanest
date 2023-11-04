@@ -10,28 +10,23 @@ import 'package:realestate/pages/userNav/login.dart';
 
 import 'package:http/http.dart'as http;
 
-class OrganizationSettings extends StatefulWidget {
-  const OrganizationSettings({super.key});
+class AddAgent extends StatefulWidget {
+  const AddAgent({super.key});
 
   @override
-  State<OrganizationSettings> createState() => _OrganizationSettingsState();
+  State<AddAgent> createState() => _AddAgentState();
 }
 
-class _OrganizationSettingsState extends State<OrganizationSettings> {
+class _AddAgentState extends State<AddAgent> {
   final secureStorage = FlutterSecureStorage();
   bool hasToken = false;
   bool onLoadState =false;
   late final Future<bool> _checkAccessTokenFuture = _checkAccessTokenOnce();
-
-  final TextEditingController pname = TextEditingController();
-  final TextEditingController pphone = TextEditingController();
   final TextEditingController pemail = TextEditingController();
-  final TextEditingController pdes = TextEditingController();
-
-  late final String rtitle;
-  late final String rtype;
 
   late int userId;
+  List<String> _suggestions = [];
+
   @override
   void initState() {
     super.initState();
@@ -59,18 +54,6 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
         return false;
       }
       else{
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        Future<http.Response> fetchProfileData(String token) async {
-          final url = Uri.parse("https://" + globals.apiUrl + '/api/organization/profile/');
-          final headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'JWT $token',
-          };
-
-          final response = await http.get(url, headers: headers);
-          return response;
-        }
-        final gresponse = await fetchProfileData(token);
         if (response.statusCode>=400){
           await secureStorage.deleteAll();
           setState(() {
@@ -84,14 +67,8 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
           return false;
         }
         else{
-          final Map<String, dynamic> gresponseData = json.decode(gresponse.body);
           setState(() {
-            userId = responseData['id'];
             hasToken = true;
-            pname.text = gresponseData['name']??"";
-            pphone.text = gresponseData['phone']??"";
-            pemail.text = gresponseData['email']??"";
-            pdes.text = gresponseData['about']??"";
           });
           return true;
         }
@@ -106,6 +83,20 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
       return false;
     }
   }
+  
+  void _getSuggestions(String query) async {
+    final aApiUrl = "https://" + globals.apiUrl + '/api/autocomplete_agent_emails/';
+    final response = await http.get(Uri.parse('$aApiUrl?q=$query'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      List<String> suggestions = List<String>.from(data);
+      print(List);
+      setState(() {
+        _suggestions = suggestions;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,7 +104,7 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
       endDrawer: const UserNavBar(),
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: DefaultAppBar(title:"Organization Settings")
+        child: DefaultAppBar(title:"Add Agent")
         ),
       body: FutureBuilder<bool>(
         key:  UniqueKey() ,
@@ -132,7 +123,7 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
                     padding: const EdgeInsets.only(top:25),
                     child: Center(
                       child: Text(
-                        "Organization Settings",
+                        "Add Agent",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontSize: 30,
@@ -156,15 +147,95 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
                         child: Column(
                           crossAxisAlignment:CrossAxisAlignment.stretch,
                           children: [
-                            OrganizationSettingsRow(property: pname,rtitle:"Organization Name",rtype:"name"),
-                            OrganizationSettingsRow(property: pemail,rtitle:"Email",rtype:"email"),
-                            OrganizationSettingsRow(property: pphone,rtitle:"Contact No",rtype:"phone"),
-                            OrganizationSettingsRow(property: pdes,rtitle:"About Organization",rtype:"mul"),
+                            Align(
+                              alignment: AlignmentDirectional.center,
+                              child: Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: SizedBox(
+                                    child: TextFormField(
+                                      controller: pemail,
+                                      autofocus: false,
+                                      obscureText: false,
+                                      keyboardType: TextInputType.emailAddress,
+                                      decoration: InputDecoration(
+                                        labelStyle: const TextStyle(
+                                          fontSize: 16, // Adjust as needed
+                                          fontWeight: FontWeight.normal, // Adjust as needed
+                                          color: Colors.black, // Adjust as needed
+                                        ),
+                                        hintStyle: const TextStyle(
+                                          fontSize: 16, // Adjust as needed
+                                          fontWeight: FontWeight.normal, // Adjust as needed
+                                          color: Colors.grey, // Adjust as needed
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Theme.of(context).colorScheme.primary, // Adjust as needed
+                                            width: 1.4,
+                                          ),
+                                          borderRadius: BorderRadius.circular(2),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Colors.black87, // Adjust as needed
+                                            width: 2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(2),
+                                        ),
+                                      ),
+                                      style: const TextStyle(
+                                        fontSize: 16, // Adjust as needed
+                                        fontWeight: FontWeight.normal, // Adjust as needed
+                                        color: Colors.black, // Adjust as needed
+                                      ),
+                                      validator: (value) {
+                                        // Add your validation logic here
+                                      },
+                                      onChanged: (query) {
+                                        _getSuggestions(query);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                            ),
+                            _suggestions.isNotEmpty
+                            ? Container(
+                                height: 200, // Adjust the height as needed
+                                child: ListView.builder(
+                                  itemCount: _suggestions.length,
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                      onTap: ()=>{
+                                        setState(() {
+                                          pemail.text=_suggestions[index];
+                                        })
+                                      },
+                                      title: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black12,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2.0, // Set border width
+                                          ),
+                                          borderRadius: BorderRadius.circular(8.0), // Set border radius
+                                        ), // Set your desired background color here
+                                        padding: EdgeInsets.all(8), // Adjust padding as needed
+                                        child: Text(
+                                          _suggestions[index],
+                                          style: TextStyle(color: Colors.black), // Set text color
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                            : SizedBox(), 
+                            SizedBox(height: 5),
                             SizedBox(
                               width: 220,
                               child: ElevatedButton(
                                 onPressed: ()=>{
-                                  _upateOrganizationSettings()
+                                  _addAgent()
                                 },
                                 style: ElevatedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
@@ -174,7 +245,7 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(top:13,bottom: 13),
                                   child: onLoadState?Container(width: 30,height: 5,child: LinearProgressIndicator()):Text(
-                                    "Update",
+                                    "Invite",
                                     style: TextStyle(
                                       color: Colors.white
                                     ),
@@ -198,30 +269,27 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
       ),
     );
   }
-  Future _upateOrganizationSettings() async {
+  Future _addAgent() async {
     final token = await secureStorage.read(key: 'access');
-    print("Process Started:");
     setState(() {
       onLoadState = true;
     });
     final response = await http.post(
-      Uri.parse("https://"+globals.apiUrl+'/api/organization/profile/update/'),
+      Uri.parse("https://"+globals.apiUrl+'/api/addAgent/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'JWT $token',
       },
       body: jsonEncode(<String, String>{
-        "name": pname.text,
-        "phone": pphone.text,
         "email": pemail.text,
-        "about": pdes.text 
     })
     );
     setState(() {
       onLoadState = false;
     });
     if (response.statusCode < 303) {
-      return _showPopUpDialog("","Organization settings updated successfully.");
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      return _showPopUpDialog("",responseData['message']);
     }
     else if(response.statusCode == 400){
       final Map<String, dynamic> responseData = json.decode(response.body);
@@ -230,11 +298,11 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
         barrierDismissible: false, // user must tap button!
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Error'),
+            title: const Text(''),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  Text(responseData['error']),
+                  Text(responseData['message']),
                 ],
               ),
             ),
@@ -251,7 +319,7 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
       );
     }
      else {
-      final Map<String, dynamic> responseData = json.decode(response.body);
+      print(response.body);
       return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -261,7 +329,7 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(responseData['error']),
+                Text("Internal Error 500!"),
               ],
             ),
           ),
@@ -303,128 +371,6 @@ class _OrganizationSettingsState extends State<OrganizationSettings> {
           ],
         );
       },
-    );
-  }
-  // Future<void> _updatePassowrd() async {
-  //   final token = await secureStorage.read(key: 'access');
-  //   final response = await http.post(
-  //     Uri.parse("https://"+globals.apiUrl+'/api/change-password/'),
-  //     headers: <String, String>{
-  //       'Content-Type': 'application/json; charset=UTF-8',
-  //       'Authorization': 'JWT $token',
-  //     },
-  //     body: jsonEncode(<String, String>{
-  //       // "old_password":old_password_controller.text,
-  //       // "new_password":new_password_controller.text,
-  //       // "re_new_password":re_new_password_controller.text
-  //     })
-  //   );
-
-  //   if (response.statusCode < 303) {
-  //     _showPopUpDialog("","Passwor has been reset successfully.");
-  //   }else if(response.statusCode >= 500){
-  //     _showPopUpDialog("Error","Server 500!");
-  //   }
-  //    else {
-  //     final Map<String, dynamic> responseData = json.decode(response.body);
-  //     return _showPopUpDialog("Error",responseData['detail']);
-  //   }
-  // }
-}
-
-class OrganizationSettingsRow extends StatelessWidget {
-  const OrganizationSettingsRow({
-    super.key,
-    required this.property, required String this.rtitle,required this.rtype
-  });
-
-  final TextEditingController property;
-  final String rtitle;
-  final String rtype;
-
-  @override
-  Widget build(BuildContext context) {
-    
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.topRight,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Container(
-              color: Theme.of(context).colorScheme.primary,
-              child: Padding(
-                padding: const EdgeInsets.only(top:5,bottom: 5,left:20,right: 20),
-                child: Text(
-                    rtitle,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-              ),
-            )
-          ),
-        ),
-        Align(
-          alignment: AlignmentDirectional.center,
-          child: Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: SizedBox(
-                child: TextFormField(
-                  controller: property,
-                  autofocus: false,
-                  obscureText: false,
-                  minLines: rtype=="mul"?3:1,
-                  maxLines: rtype=="mul"?5:1,
-                  keyboardType: rtype=="phone"?TextInputType.phone:
-                                  rtype=="email"?TextInputType.emailAddress:
-                                    rtype=="url"?TextInputType.url:
-                                      rtype=="mul"?TextInputType.multiline:TextInputType.name,
-                  decoration: InputDecoration(
-                    labelStyle: const TextStyle(
-                      fontSize: 16, // Adjust as needed
-                      fontWeight: FontWeight.normal, // Adjust as needed
-                      color: Colors.black, // Adjust as needed
-                    ),
-                    hintStyle: const TextStyle(
-                      fontSize: 16, // Adjust as needed
-                      fontWeight: FontWeight.normal, // Adjust as needed
-                      color: Colors.grey, // Adjust as needed
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary, // Adjust as needed
-                        width: 1.4,
-                      ),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.black87, // Adjust as needed
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  style: const TextStyle(
-                    fontSize: 16, // Adjust as needed
-                    fontWeight: FontWeight.normal, // Adjust as needed
-                    color: Colors.black, // Adjust as needed
-                  ),
-                  validator: (value) {
-                    // Add your validation logic here
-                  },
-                  onChanged: (value) {
-                    // Handle onChanged event if needed
-                  },
-                ),
-              ),
-            ),
-        ),
-        SizedBox(height: 5),
-      ],
     );
   }
 }
