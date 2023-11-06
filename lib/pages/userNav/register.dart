@@ -612,7 +612,7 @@ class _RegisterState extends State<Register> {
       body: jsonEncode(<String, String>{
         'role': roleController,
         'full_name': nameController.text,
-        'email': emailController.text,
+        'email': emailController.text.toLowerCase(),
         'phone': phoneController.text,
         'password': passwordController.text,
         're_password': confirmPasswordController.text,

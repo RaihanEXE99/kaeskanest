@@ -330,6 +330,7 @@ class _AddAgentState extends State<AddAgent> {
             child: ListBody(
               children: <Widget>[
                 Text("Internal Error 500!"),
+                Text(response.body)
               ],
             ),
           ),

@@ -185,26 +185,26 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
           ),
           if(role=="2"||role=="3")
             ...[
-            if(role=='3')ListTile(
-              leading: Icon(
-                Icons.supervised_user_circle_outlined,
-                color: Theme.of(context).colorScheme.primary,
-                ),
-              title: const Text('Organization Settings'),
-              onTap: ()=> {
-                Navigator.pushNamed(context, "/organizationSettings")
-              },
-            ),
-            if(role=='2')ListTile(
-              leading: Icon(
-                Icons.supervised_user_circle_outlined,
-                color: Theme.of(context).colorScheme.primary,
-                ),
-              title: const Text('Agent Settings'),
-              onTap: ()=> {
-                Navigator.pushNamed(context, "/agentSettings")
-              },
-            ),
+            // if(role=='3')ListTile(
+            //   leading: Icon(
+            //     Icons.supervised_user_circle_outlined,
+            //     color: Theme.of(context).colorScheme.primary,
+            //     ),
+            //   title: const Text('Organization Settings'),
+            //   onTap: ()=> {
+            //     Navigator.pushNamed(context, "/organizationSettings")
+            //   },
+            // ),
+            // if(role=='2')ListTile(
+            //   leading: Icon(
+            //     Icons.supervised_user_circle_outlined,
+            //     color: Theme.of(context).colorScheme.primary,
+            //     ),
+            //   title: const Text('Agent Settings'),
+            //   onTap: ()=> {
+            //     Navigator.pushNamed(context, "/agentSettings")
+            //   },
+            // ),
             if(role=='2')ListTile(
               leading: Icon(
                 Icons.notifications,
@@ -243,7 +243,9 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
                 Navigator.pushNamed(context, "/addAgent")
               },
             ),
-            ListTile(
+            ]
+          ],
+          ListTile(
               leading: Icon(
                 Icons.logout_outlined,
                 color: Theme.of(context).colorScheme.primary,
@@ -253,8 +255,6 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
                 logoutUser()
               },
             )
-            ]
-          ]
       ],
     );
   }

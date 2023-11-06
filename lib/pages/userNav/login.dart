@@ -346,7 +346,7 @@ class _LoginState extends State<Login> {
         'Content-Type': 'application/json',
       };
       final body = jsonEncode({
-        'email': email,
+        'email': email.toLowerCase(),
         'password': password,
       });
       final response = await http.post(url, headers: headers, body: body);

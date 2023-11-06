@@ -149,7 +149,6 @@ class _InvitationsState extends State<Invitations> {
             );
           }
          },
-        
       ),
     );
   }
