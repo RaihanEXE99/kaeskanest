@@ -184,6 +184,7 @@ class _RegisterState extends State<Register> {
                           child: SizedBox(
                             height: 45,
                             child: TextFormField(
+                              maxLines: 1,
                               controller: nameController,
                               autofocus: false,
                               obscureText: false,
