@@ -13,7 +13,7 @@ class Navbar extends StatelessWidget {
             padding: const EdgeInsets.only(top: 50,bottom: 15),
             child: Center(
               child: Text(
-                  "Realestate",
+                  "Kaeskanest",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontSize: 35,

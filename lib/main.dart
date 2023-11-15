@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:realestate/pages/home.dart';
 import 'package:realestate/pages/navbar/about.dart';
 import 'package:realestate/pages/navbar/contact.dart';
+import 'package:realestate/pages/navbar/property.dart';
 import 'package:realestate/pages/navbar/propertyList.dart';
 import 'package:realestate/pages/userNav/addAgent.dart';
 // import 'package:realestate/pages/userNav/agentSettings.dart';
 import 'package:realestate/pages/userNav/invitations.dart';
 import 'package:realestate/pages/userNav/login.dart';
+import 'package:realestate/pages/userNav/myAgents.dart';
+import 'package:realestate/pages/userNav/myProperty.dart';
 // import 'package:realestate/pages/userNav/organizationSettings.dart';
 import 'package:realestate/pages/userNav/profileSettings.dart';
 import 'package:realestate/pages/userNav/register.dart';
@@ -51,9 +54,12 @@ class MyApp extends StatelessWidget {
         // "/organizationSettings":(context)=> OrganizationSettings(),
         // "/agentSettings":(context)=> AgentSettings(),
         "/addAgent":(context)=> AddAgent(),
+        "/myProperty":(context)=> MyProperty(),
+        "/myAgents":(context)=> MyAgents(),
         "/invitations":(context)=> Invitations(),
         "/about":(context)=> About(),
         "/contact":(context)=> Contact(),
+        // "/property/":(context)=> PropertyDetails(),
       },
     );
   }

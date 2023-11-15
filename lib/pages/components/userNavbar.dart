@@ -51,7 +51,6 @@ class _UserNavBarState extends State<UserNavBar> {
       }
       else{
         final Map<String, dynamic> responseData = json.decode(response.body);
-        print("ROLE:"*10);
         if(mounted){
           setState(() {
             userName = responseData['full_name'];
@@ -107,7 +106,7 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
               builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return LinearProgressIndicator(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Colors.black87,
                   );
                 } else if (snapshot.hasError) {
                   return ErrorWidget(snapshot.error.toString());
@@ -127,35 +126,28 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
           accountName:RichText(
             text: TextSpan(
               children: [
-                TextSpan(text:userName+"\t"),
                 TextSpan(text:
                   role=="1"?"":
-                  (role=="2"?"(Agent)":"(Organization)"),
-                  style: TextStyle(color: Colors.orange.shade300,fontWeight: FontWeight.w500)
-                )
+                  (role=="2"?"Agent\n":"Organization\n"),
+                  style: TextStyle(color: Colors.orange.shade300,fontWeight: FontWeight.bold,fontSize: 10)
+                ),
+                TextSpan(text:userName,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700)),
               ]
             ),
           ),
           accountEmail:Text(
             userEmail
           ),
-          currentAccountPicture: CircleAvatar(
-            child: ClipOval(
-              child: Image.asset(
-                'assets/profile/EXE99.jpg',
-                fit: BoxFit.cover,
-                ),
-            ),
-          ),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary
+            // color: Colors.black87
+            color: Colors.black
           ),
         ),
         if(!hasToken)...[
           ListTile(
             leading: Icon(
               Icons.login_rounded,
-              color: Theme.of(context).colorScheme.primary,
+              color: Colors.black87,
               ),
             title: const Text('Login'),
             onTap: ()=> {
@@ -166,7 +158,7 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
           ListTile(
             leading: Icon(
               Icons.settings,
-              color: Theme.of(context).colorScheme.primary,
+              color: Colors.black87,
               ),
             title: const Text('Settings'),
             onTap: ()=> {
@@ -176,7 +168,7 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
           ListTile(
             leading: Icon(
               Icons.account_circle_outlined,
-              color: Theme.of(context).colorScheme.primary,
+              color: Colors.black87,
               ),
             title: const Text('Profile Settings'),
             onTap: ()=> {
@@ -188,7 +180,7 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
             // if(role=='3')ListTile(
             //   leading: Icon(
             //     Icons.supervised_user_circle_outlined,
-            //     color: Theme.of(context).colorScheme.primary,
+            //     color: Colors.black87,
             //     ),
             //   title: const Text('Organization Settings'),
             //   onTap: ()=> {
@@ -198,17 +190,38 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
             // if(role=='2')ListTile(
             //   leading: Icon(
             //     Icons.supervised_user_circle_outlined,
-            //     color: Theme.of(context).colorScheme.primary,
+            //     color: Colors.black87,
             //     ),
             //   title: const Text('Agent Settings'),
             //   onTap: ()=> {
             //     Navigator.pushNamed(context, "/agentSettings")
             //   },
             // ),
+            // Container(
+            //     margin: EdgeInsets.symmetric(vertical: 10),
+            //     child: Row(
+            //       children: <Widget>[
+            //         Expanded(
+            //           child: Divider(
+            //             thickness: 1,
+            //           ),
+            //         ),
+            //         // Padding(
+            //         //   padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            //         //   child: ElevatedButton.icon(onPressed: ()=>{}, icon: Icon(Icons.account_circle_rounded), label: Text("Agent")),
+            //         // ),
+            //         Expanded(
+            //           child: Divider(
+            //             thickness: 1,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
             if(role=='2')ListTile(
               leading: Icon(
                 Icons.notifications,
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.black87,
                 ),
               title: const Text('Invitations'),
               onTap: ()=> {
@@ -218,25 +231,27 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
               ListTile(
               leading: Icon(
                 Icons.house_outlined,
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.black87,
                 ),
               title: const Text('My Property'),
               onTap: ()=> {
+                Navigator.pushNamed(context, "/myProperty")
               },
             ),
             if(role=='3')ListTile(
               leading: Icon(
                 Icons.group_outlined,
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.black87,
                 ),
               title: const Text('My Agents'),
               onTap: ()=> {
+                Navigator.pushNamed(context, "/myAgents")
               },
             ),
             if(role=='3')ListTile(
               leading: Icon(
                 Icons.group_add_outlined,
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.black87,
                 ),
               title: const Text('Add Agent'),
               onTap: ()=> {
@@ -248,7 +263,7 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
           ListTile(
               leading: Icon(
                 Icons.logout_outlined,
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.black87,
                 ),
               title: const Text('Logout'),
               onTap: ()=> {

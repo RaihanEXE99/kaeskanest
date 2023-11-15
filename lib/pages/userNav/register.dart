@@ -621,7 +621,7 @@ class _RegisterState extends State<Register> {
     );
 
     if (response.statusCode < 303) {
-      print('Registration successful');
+      print('Registration successful! Please check your email to activate your account!');
       await Future.delayed(Duration(seconds: 1)); // Wait for 2 seconds
       Navigator.pushReplacement(
         context,

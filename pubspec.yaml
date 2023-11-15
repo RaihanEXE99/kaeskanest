@@ -43,6 +43,9 @@ dependencies:
   permission_handler: ^11.0.1
   scroll_to_index: ^3.0.1
 
+  image_picker: ^1.0.4
+  url_launcher: ^6.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -71,6 +74,7 @@ flutter:
     - assets/profile/
     - assets/img/
     - assets/map/
+    - assets/app/
   fonts:
    - family: Poppins
      fonts:

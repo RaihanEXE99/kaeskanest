@@ -118,35 +118,48 @@ class _InvitationsState extends State<Invitations> {
             // Handle error
             return ErrorWidget(snapshot.error.toString());
           } else {
-            return ListView.builder(
+            return onLoadState?Center(child: CircularProgressIndicator()):invitations.isNotEmpty?ListView.builder(
               itemCount: invitations.length,
               itemBuilder: (context, index) {
                 return Card(
                   margin: EdgeInsets.all(16),
-                  child: ListTile(
-                    title: Text('Organization: ${invitations[index]['organization']}'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            _acceptInvitation(invitations[index]['id']);
-                          },
-                          child: Text('Accept'),
+                        Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Text('You received an invitation from the organization called ${invitations[index]['organization']}. Are you willing to join this organization?',style: TextStyle(fontSize: 15,),),
                         ),
-                        SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            _rejectInvitation(invitations[index]['id']);
-                          },
-                          child: Text('Reject'),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  onLoadState=true;
+                                });
+                                _acceptInvitation(invitations[index]['id']);
+                              },
+                              child: Text('Accept'),
+                            ),
+                            SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  onLoadState=true;
+                                });
+                                _rejectInvitation(invitations[index]['id']);
+                              },
+                              child: Text('Reject'),
+                            ),
+                          ],
                         ),
+                        SizedBox(height: 15,)
                       ],
-                    ),
-                  ),
+                    )
                 );
               },
-            );
+            ):Center(child: Text("You have no invitation!",style: TextStyle(fontSize: 14),));
           }
          },
       ),
@@ -162,6 +175,9 @@ class _InvitationsState extends State<Invitations> {
 
     final response = await http.post(url, headers: headers);
     print(response.body);
+    setState(() {
+      onLoadState=false;
+    });
     Navigator.pushNamed(context, "/invitations");
   }
   void _rejectInvitation(invitation) async {
@@ -171,44 +187,11 @@ class _InvitationsState extends State<Invitations> {
       'Content-Type': 'application/json',
       'Authorization': 'JWT $token',
     };
-
+    setState(() {
+      onLoadState=false;
+    });
     final response = await http.post(url, headers: headers);
+    print(response);
     Navigator.pushNamed(context, "/invitations");
   }
 }
-
-// class InvitationCard extends StatelessWidget {
-//   final Map<String, dynamic> invitation;
-
-//   InvitationCard(this.invitation, token);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       margin: EdgeInsets.all(16),
-//       child: ListTile(
-//         title: Text('Organization: ${invitation['organization']}'),
-//         trailing: Row(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             ElevatedButton(
-//               onPressed: () {
-//                 _acceptInvitation(invitation['organization']);
-//               },
-//               child: Text('Accept'),
-//             ),
-//             SizedBox(width: 8),
-//             ElevatedButton(
-//               onPressed: () {
-//                 // Handle Reject button click
-//               },
-//               child: Text('Reject'),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-  
-  
-// }

@@ -25,8 +25,8 @@ class _AddAgentState extends State<AddAgent> {
   final TextEditingController pemail = TextEditingController();
 
   late int userId;
-  List<String> _suggestions = [];
-
+  List<dynamic> _suggestions = [];
+  var loading = false;
   @override
   void initState() {
     super.initState();
@@ -89,8 +89,9 @@ class _AddAgentState extends State<AddAgent> {
     final response = await http.get(Uri.parse('$aApiUrl?q=$query'));
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      List<String> suggestions = List<String>.from(data);
+      final List<dynamic> suggestions = json.decode(response.body);
+      // final data = jsonDecode(response.body);
+      // List<String> suggestions = Map<String, dynamic>.from(data);
       print(List);
       setState(() {
         _suggestions = suggestions;
@@ -116,34 +117,26 @@ class _AddAgentState extends State<AddAgent> {
             // Handle error
             return ErrorWidget(snapshot.error.toString());
           } else {
-            return SingleChildScrollView(
+            return onLoadState?Center(child: CircularProgressIndicator()):SingleChildScrollView(
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top:25),
-                    child: Center(
-                      child: Text(
-                        "Add Agent",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                          decorationThickness: 1,
-                        ),
-                      ),
-                    ),
-                  ),  
+                  Image.asset(
+                    "assets/img/cardimage.jpg",
+                    height: 160,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ), 
                   Padding(
                     padding: const EdgeInsets.only(left:20,right: 20,top:20),
                     child: Card(
+                      color: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       // Set the clip behavior of the card
                       clipBehavior: Clip.antiAliasWithSaveLayer,
                       child: Padding(
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: Column(
                           crossAxisAlignment:CrossAxisAlignment.stretch,
                           children: [
@@ -158,6 +151,8 @@ class _AddAgentState extends State<AddAgent> {
                                       obscureText: false,
                                       keyboardType: TextInputType.emailAddress,
                                       decoration: InputDecoration(
+                                        fillColor: Colors.white,
+                                        hintText: "Search agent by email ..",
                                         labelStyle: const TextStyle(
                                           fontSize: 16, // Adjust as needed
                                           fontWeight: FontWeight.normal, // Adjust as needed
@@ -170,10 +165,10 @@ class _AddAgentState extends State<AddAgent> {
                                         ),
                                         enabledBorder: OutlineInputBorder(
                                           borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.primary, // Adjust as needed
+                                            color: Colors.black87, // Adjust as needed
                                             width: 1.4,
                                           ),
-                                          borderRadius: BorderRadius.circular(2),
+                                          borderRadius: BorderRadius.circular(5),
                                         ),
                                         focusedBorder: OutlineInputBorder(
                                           borderSide: const BorderSide(
@@ -186,7 +181,7 @@ class _AddAgentState extends State<AddAgent> {
                                       style: const TextStyle(
                                         fontSize: 16, // Adjust as needed
                                         fontWeight: FontWeight.normal, // Adjust as needed
-                                        color: Colors.black, // Adjust as needed
+                                        color: Colors.white, // Adjust as needed
                                       ),
                                       validator: (value) {
                                         // Add your validation logic here
@@ -198,68 +193,88 @@ class _AddAgentState extends State<AddAgent> {
                                   ),
                                 ),
                             ),
-                            _suggestions.isNotEmpty
-                            ? Container(
-                                height: 200, // Adjust the height as needed
-                                child: ListView.builder(
-                                  itemCount: _suggestions.length,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      onTap: ()=>{
-                                        setState(() {
-                                          pemail.text=_suggestions[index];
-                                        })
-                                      },
-                                      title: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black12,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 2.0, // Set border width
-                                          ),
-                                          borderRadius: BorderRadius.circular(8.0), // Set border radius
-                                        ), // Set your desired background color here
-                                        padding: EdgeInsets.all(8), // Adjust padding as needed
-                                        child: Text(
-                                          _suggestions[index],
-                                          style: TextStyle(color: Colors.black), // Set text color
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
-                            : SizedBox(), 
-                            SizedBox(height: 5),
-                            SizedBox(
-                              width: 220,
-                              child: ElevatedButton(
-                                onPressed: ()=>{
-                                  _addAgent()
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5)
-                                  )
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top:13,bottom: 13),
-                                  child: onLoadState?Container(width: 30,height: 5,child: LinearProgressIndicator()):Text(
-                                    "Invite",
-                                    style: TextStyle(
-                                      color: Colors.white
-                                    ),
-                                  ),
-                                )
-                              ),
-                            ),
+                            
+                            // SizedBox(height: 5),
+                            // SizedBox(
+                            //   width: 220,
+                            //   child: ElevatedButton(
+                            //     onPressed: ()=>{
+                            //       // _addAgent()
+                            //     },
+                            //     style: ElevatedButton.styleFrom(
+                            //       shape: RoundedRectangleBorder(
+                            //         borderRadius: BorderRadius.circular(5)
+                            //       )
+                            //     ),
+                            //     child: Padding(
+                            //       padding: const EdgeInsets.only(top:13,bottom: 13),
+                            //       child: onLoadState?Container(width: 30,height: 5,child: LinearProgressIndicator()):Text(
+                            //         "Search Agent",
+                            //         style: TextStyle(
+                            //           color: Colors.white
+                            //         ),
+                            //       ),
+                            //     )
+                            //   ),
+                            // ),
                       
                           ],
                         ),
                       ),
                     ),
                   ),
-                  
+                  _suggestions.isNotEmpty
+                            ? ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: _suggestions.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  onTap: ()=>{
+                                    setState(() {
+                                      pemail.text=_suggestions[index]['email'];
+                                      loading=true;
+                                    }),
+                                    _addAgent()
+                                  },
+                                  title: Container(
+                                    margin: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 2.0, // Set border width
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0), // Set border radius
+                                    ), // Set your desired background color here
+                                    padding: EdgeInsets.all(8), // Adjust padding as needed
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              _suggestions[index]['name'],//comeback
+                                              style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold), // Set text color
+                                            ),
+                                            Text(
+                                              _suggestions[index]['email'],//comeback
+                                              style: TextStyle(color: Colors.orange), // Set text color
+                                            ),
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(Icons.send,color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                            : SizedBox(), 
                 ],
               ),
             );
