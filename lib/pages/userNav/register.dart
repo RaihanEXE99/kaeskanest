@@ -47,9 +47,9 @@ class _RegisterState extends State<Register> {
                           elevation: 0,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(8),
+                              bottomLeft: Radius.circular(0),
                               bottomRight: Radius.circular(0),
-                              topLeft: Radius.circular(8),
+                              topLeft: Radius.circular(0),
                               topRight: Radius.circular(0),
                             ),
                           ),
@@ -74,9 +74,9 @@ class _RegisterState extends State<Register> {
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(0),
-                              bottomRight: Radius.circular(8),
+                              bottomRight: Radius.circular(0),
                               topLeft: Radius.circular(0),
-                              topRight: Radius.circular(8),
+                              topRight: Radius.circular(0),
                             ),
                           ),
                         ),

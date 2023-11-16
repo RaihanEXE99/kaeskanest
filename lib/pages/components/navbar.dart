@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:realestate/pages/navbar/property.dart';
 
 class Navbar extends StatelessWidget {
   const Navbar({super.key});
@@ -56,57 +57,53 @@ class Navbar extends StatelessWidget {
               Icons.arrow_circle_right_rounded,
               color: Theme.of(context).colorScheme.primary,
               ),
-            title: const Text('Property List'),
-            onTap: ()=> {
-              Navigator.pushNamed(context, "/propertyList")
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.arrow_circle_right_rounded,
-              color: Theme.of(context).colorScheme.primary,
-              ),
             title: const Text('Contact'),
             onTap: ()=> {
               Navigator.pushNamed(context, "/contact")
             },
           ),
-          ListTile(
-            leading: Icon(
-              Icons.arrow_circle_right_rounded,
-              color: Theme.of(context).colorScheme.primary,
-              ),
-            title: const Text('Agent List'),
-            onTap: ()=> {
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.arrow_circle_right_rounded,
-              color: Theme.of(context).colorScheme.primary,
-              ),
-            title: const Text('Agent Profile'),
-            onTap: ()=> {
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.arrow_circle_right_rounded,
-              color: Theme.of(context).colorScheme.primary,
-              ),
-            title: const Text('Organization'),
-            onTap: ()=> {
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.arrow_circle_right_rounded,
-              color: Theme.of(context).colorScheme.primary,
-              ),
-            title: const Text('Add Listing'),
-            onTap: ()=> {
-            },
-          ),
+          // ListTile(
+          //   leading: Icon(
+          //     Icons.arrow_circle_right_rounded,
+          //     color: Theme.of(context).colorScheme.primary,
+          //     ),
+          //   title: Text('Test'),
+          //   onTap: ()=> {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => PropertyDetails(propertyID: "ff9b3efe-5d57-4cd0-ae56-a49b28443ba6"),
+          //       ),
+          //     )
+          //   },
+          // ),
+          // ListTile(
+          //   leading: Icon(
+          //     Icons.arrow_circle_right_rounded,
+          //     color: Theme.of(context).colorScheme.primary,
+          //     ),
+          //   title: const Text('Agent Profile'),
+          //   onTap: ()=> {
+          //   },
+          // ),
+          // ListTile(
+          //   leading: Icon(
+          //     Icons.arrow_circle_right_rounded,
+          //     color: Theme.of(context).colorScheme.primary,
+          //     ),
+          //   title: const Text('Organization'),
+          //   onTap: ()=> {
+          //   },
+          // ),
+          // ListTile(
+          //   leading: Icon(
+          //     Icons.arrow_circle_right_rounded,
+          //     color: Theme.of(context).colorScheme.primary,
+          //     ),
+          //   title: const Text('Add Listing'),
+          //   onTap: ()=> {
+          //   },
+          // ),
         ],
       ),
     );

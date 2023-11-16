@@ -184,9 +184,9 @@ class _MyAgentsState extends State<MyAgents> {
                             label: Text("Skype",style: TextStyle(fontSize: 12,fontWeight: FontWeight.w400,color: Colors.black54),)
                           ),
                           ElevatedButton.icon(onPressed: ()=>{
-                            _showBottomDrawer(context,(myAgents[index]['linkedin_link']==""?"Not Available":myAgents[index]['linkedin_link']))
+                            _showBottomDrawer(context,(myAgents[index]['website']==""?"Not Available":myAgents[index]['website']))
                           }, icon: Icon(Icons.link,color: Colors.black54,),style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white)),
-                            label: Text("Linkedin",style: TextStyle(fontSize: 12,fontWeight: FontWeight.w400,color: Colors.black54),)
+                            label: Text("Website",style: TextStyle(fontSize: 12,fontWeight: FontWeight.w400,color: Colors.black54),)
                           ),
                         ],
                       ),

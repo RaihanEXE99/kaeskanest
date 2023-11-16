@@ -19,11 +19,22 @@ class RegSuccess extends StatelessWidget {
               size: 100.0,
             ),
             SizedBox(height: 16.0),
-            Text(
-              'Registration Successful!',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
+            Center(
+              child: Text(
+                'Registration Successful!',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                'Please Check your email to activate your account!',
+                style: TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             SizedBox(height: 16.0),

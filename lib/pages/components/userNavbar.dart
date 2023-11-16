@@ -155,9 +155,19 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
             },
           )]
         else...[
+           ListTile(
+            leading: Icon(
+              Icons.search_rounded,
+              color: Colors.black,
+              ),
+            title: const Text('Property List'),
+            onTap: ()=> {
+              Navigator.pushNamed(context, "/propertyList")
+            },
+          ),
           ListTile(
             leading: Icon(
-              Icons.settings,
+              Icons.settings_outlined,
               color: Colors.black87,
               ),
             title: const Text('Settings'),
@@ -236,6 +246,16 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
               title: const Text('My Property'),
               onTap: ()=> {
                 Navigator.pushNamed(context, "/myProperty")
+              },
+            ),
+              ListTile(
+              leading: Icon(
+                Icons.add_home_work_outlined,
+                color: Colors.black87,
+                ),
+              title: const Text('Add Property'),
+              onTap: ()=> {
+                Navigator.pushNamed(context, "/addProperty")
               },
             ),
             if(role=='3')ListTile(

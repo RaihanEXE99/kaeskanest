@@ -21,7 +21,9 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'dart:async'; 
 import 'dart:typed_data'; 
-import 'dart:ui' as ui; 
+import 'dart:ui' as ui;
+
+import 'package:realestate/pages/navbar/property.dart'; 
 
 
 class HomePage extends StatefulWidget {
@@ -65,6 +67,7 @@ class _HomePageState extends State<HomePage> {
   Set<Marker> _markers = Set();
 
   var properties = [];
+  var searchedProperties = [];
 
   @override
   void initState() {
@@ -204,6 +207,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> getProperties(LatLng location) async {
+    _clearMarkers();
     Future<http.Response> getRecProperties(LatLng location) async {
       // final url = Uri.parse("https://" + globals.apiUrl + '/api/search/`');
       final headers = {
@@ -214,7 +218,7 @@ class _HomePageState extends State<HomePage> {
         "category": selectedHomeOption,
         "lat": location.latitude.toString(),
         "long": location.longitude.toString(),
-        "rad": (_radius/1000).toString(),
+        "radius": (_radius/1000).toString(),
       };
       final String url = "https://" + globals.apiUrl + '/api/search/';
       final String queryString = Uri(queryParameters: queryParams).query;
@@ -259,6 +263,10 @@ class _HomePageState extends State<HomePage> {
       position: position,
       // infoWindow: InfoWindow(title: 'New Marker', snippet: 'This is a new marker'),
       icon: BitmapDescriptor.fromBytes(tmpImg!),
+      onTap: () => {
+        getPropertiesModelCLicked(position,context),
+        
+      },
     );
 
     if(mounted){
@@ -267,6 +275,63 @@ class _HomePageState extends State<HomePage> {
       });
     }
       // _mapController.animateCamera(CameraUpdate.newLatLng(position));
+  }
+
+  Future<void> getPropertiesModelCLicked(LatLng location,context) async {
+    setState(() {
+      zoomLevel = calculateZoomLevel(_radius,location);
+    });
+    Marker newMarker = Marker(
+      markerId: MarkerId(location.toString()),
+      position: location,
+      // infoWindow: InfoWindow(title: 'New Marker', snippet: 'This is a new marker'),
+    );
+    Future<http.Response> getRecProperties(LatLng location) async {
+      // final url = Uri.parse("https://" + globals.apiUrl + '/api/search/`');
+      final headers = {
+        'Content-Type': 'application/json',
+      };
+      final Map<String, dynamic> queryParams = {
+        "type": selectedSaleOption,
+        "category": selectedHomeOption,
+        "lat": location.latitude.toString(),
+        "long": location.longitude.toString(),
+        "radius": ((_radius/1000)/50).toString(),
+      };
+      print(queryParams);
+      final String url = "https://" + globals.apiUrl + '/api/search/';
+      final String queryString = Uri(queryParameters: queryParams).query;
+      final String requestUrl = '$url?$queryString';
+      print(requestUrl);
+      final response = await http.get(Uri.parse(requestUrl), headers: headers,);
+      return response;
+    }
+    final response = await getRecProperties(location);
+
+    if (response.statusCode < 303) {
+      final List<dynamic> responseData = json.decode(response.body);
+      if(mounted){
+        setState(() {
+          searchedProperties=responseData;
+        });
+      }
+      print(responseData);
+      print(responseData.runtimeType);
+      _showBottomDrawer(context,location);
+    }else if(response.statusCode < 510){
+      print("Error! 400");
+      final String encodeFirst = json.encode(response.body);
+      var data = json.decode(encodeFirst);
+      print(data);
+    }else{
+      print("Server Error! 500");
+    }
+  }
+
+  void _clearMarkers() {
+    setState(() {
+      _markers = {};
+    });
   }
 
   @override
@@ -371,6 +436,8 @@ class _HomePageState extends State<HomePage> {
                                   _locationController.text = _places[index].name;
                                   _currentPosition = LatLng(_places[index].lat, _places[index].long);
                                   _mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_currentPosition,zoom: zoomLevel)));
+                                  getProperties(_currentPosition = LatLng(_places[index].lat, _places[index].long));
+                                  // point();
                                 });
                                 setState(() {
                                   _places = [];
@@ -807,7 +874,14 @@ class _HomePageState extends State<HomePage> {
                                 "Details",
                                 style: TextStyle(color: Colors.white),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PropertyDetails(propertyID: ppt["sku"]),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -906,6 +980,47 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _showBottomDrawer(BuildContext context,ppt) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+            color: Colors.black,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: searchedProperties.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title:  _propertyCard(context,searchedProperties[index]),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.white)),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Close',style: TextStyle(color: Colors.black,fontSize: 15)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
   // Container _categoryDropdown() {
   //   return Container(
   //     width: 150,

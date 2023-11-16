@@ -45,9 +45,9 @@ class _LoginState extends State<Login> {
                         elevation: 0,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(8),
+                            bottomLeft: Radius.circular(0),
                             bottomRight: Radius.circular(0),
-                            topLeft: Radius.circular(8),
+                            topLeft: Radius.circular(0),
                             topRight: Radius.circular(0),
                           ),
                         ),
@@ -72,9 +72,9 @@ class _LoginState extends State<Login> {
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(0),
-                            bottomRight: Radius.circular(8),
+                            bottomRight: Radius.circular(0),
                             topLeft: Radius.circular(0),
-                            topRight: Radius.circular(8),
+                            topRight: Radius.circular(0),
                           ),
                         ),
                       ),
@@ -369,7 +369,7 @@ class _LoginState extends State<Login> {
     final password = passwordController.text;
 
     final response = await createJwtToken(email, password);
-
+    
     if (response.statusCode < 303) {
       final Map<String, dynamic> responseData = json.decode(response.body);
       print(responseData['access']);
@@ -394,9 +394,10 @@ class _LoginState extends State<Login> {
       });
     }
      else {
-      final Map<String, dynamic> responseData = json.decode(response.body);
+      final Map<String, dynamic> xresponseData = json.decode(response.body);
+      print(xresponseData);
       setState((){
-        errorText = responseData.values.first;
+        errorText = xresponseData.values.first;
       });
     }
     setState(() {
