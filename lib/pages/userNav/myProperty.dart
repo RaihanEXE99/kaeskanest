@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'package:realestate/actions/action.dart';
-import "package:realestate/global.dart" as globals;
+import 'package:Kaeskanest/actions/action.dart';
+import "package:Kaeskanest/global.dart" as globals;
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:realestate/pages/components/appbar.dart';
-import 'package:realestate/pages/components/navbar.dart';
-import 'package:realestate/pages/components/userNavbar.dart';
-import 'package:realestate/pages/userNav/login.dart';
+import 'package:Kaeskanest/pages/components/appbar.dart';
+import 'package:Kaeskanest/pages/components/navbar.dart';
+import 'package:Kaeskanest/pages/components/userNavbar.dart';
+import 'package:Kaeskanest/pages/userNav/login.dart';
+import 'package:Kaeskanest/pages/navbar/property.dart'; 
 
 import 'package:http/http.dart'as http;
 
@@ -88,6 +89,12 @@ class _MyPropertyState extends State<MyProperty> {
       return false;
     }
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -322,7 +329,14 @@ class _MyPropertyState extends State<MyProperty> {
                                 "Details",
                                 style: TextStyle(color: Colors.white),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PropertyDetails(propertyID: ppt["sku"]),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),

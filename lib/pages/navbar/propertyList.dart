@@ -21,8 +21,8 @@ import 'package:http/http.dart';
 import 'package:http/http.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:realestate/global.dart' as globals;
-import 'package:realestate/pages/navbar/property.dart';
+import 'package:Kaeskanest/global.dart' as globals;
+import 'package:Kaeskanest/pages/navbar/property.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -40,7 +40,7 @@ class Place {
 class _MapScreenState extends State<MapScreen> {
   final String apiKey = globals.apiKey;
   late GoogleMapController _mapController;
-  var _selectedLocation;
+  var _selectedLocation = LatLng(0, 0);
   Set<Marker> _markers = Set();
   
   double _radius = 1*1000;
@@ -69,24 +69,40 @@ class _MapScreenState extends State<MapScreen> {
     _mapController = controller;
   }
 
+  // double calculateZoomLevel(double radius, LatLng center) {
+  //     var _add = 1;
+  //     if(radius>10000){
+  //       _add = 2;
+  //     }
+  //     // Assuming the Earth's radius is approximately 6371 kilometers
+  //     double earthRadius = 6371.0;
+
+  //     // Convert radius to radians
+  //     double radiusInRadians = radius / earthRadius;
+
+  //     // Calculate the angular distance on the Earth's surface
+  //     double centralAngle = 2 * asin(sqrt(pow(sin(radiusInRadians / 2), 2) +
+  //         cos(center.latitude * (pi / 180)) *
+  //             cos(center.latitude * (pi / 180)) *
+  //             pow(sin(radiusInRadians / 2), 2)));
+
+  //     // Calculate the zoom level based on the central angle
+  //     double zoomLevel = 12/_add - (log(centralAngle) / log(2));
+
+  //     return zoomLevel;
+  //   }
   double calculateZoomLevel(double radius, LatLng center) {
-      // Assuming the Earth's radius is approximately 6371 kilometers
-      double earthRadius = 6371.0;
+    // Assuming the Earth's radius is approximately 6371 kilometers
+    double earthRadius = 6371.0;
 
-      // Convert radius to radians
-      double radiusInRadians = radius / earthRadius;
+    // Convert radius to radians
+    double radiusInRadians = radius / earthRadius;
 
-      // Calculate the angular distance on the Earth's surface
-      double centralAngle = 2 * asin(sqrt(pow(sin(radiusInRadians / 2), 2) +
-          cos(center.latitude * (pi / 180)) *
-              cos(center.latitude * (pi / 180)) *
-              pow(sin(radiusInRadians / 2), 2)));
+    // Calculate the zoom level based on the radius
+    double zoomLevel = 10 - log(radiusInRadians) / log(2);
 
-      // Calculate the zoom level based on the central angle
-      double zoomLevel = 11 - (log(centralAngle) / log(2));
-
-      return zoomLevel;
-    }
+    return zoomLevel;
+  }
   
   Future<void> autoCompleteSearch(String input) async {
     final response = await get(
@@ -111,9 +127,11 @@ class _MapScreenState extends State<MapScreen> {
       }).toList();
 
       _places = await Future.wait(futures);
-      setState(() {
-        _places=_places;
-      });
+      if(mounted){
+        setState(() {
+          _places=_places;
+        });
+      }
     }
   }
 
@@ -215,25 +233,16 @@ class _MapScreenState extends State<MapScreen> {
       if(mounted){
         setState(() {
           properties=responseData;
+          zoomLevel=calculateZoomLevel(_radius, _selectedLocation);
         });
       }
-      print(responseData);
-      print(responseData.runtimeType);
       for (Map<String, dynamic> item in responseData) {
         _addMarker(LatLng(item['lat'], item['long']));
       }
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text("Total ${properties.length} property found!"),
-      //     duration: Duration(seconds: 1),
-      //     action: SnackBarAction(
-      //       label: 'Dismiss',
-      //       onPressed: () {
-      //         // Perform some action when the "Dismiss" button is pressed
-      //       },
-      //     ),
-      //   ),
-      // );
+      setState(() {
+        _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_selectedLocation,zoom: zoomLevel)));
+      });
+      // _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_selectedLocation,zoom: zoomLevel)));
     }else if(response.statusCode < 510){
       print("Error! 400");
       final String encodeFirst = json.encode(response.body);
@@ -292,11 +301,18 @@ class _MapScreenState extends State<MapScreen> {
     _addMeMarker(location);
     setState(() {
       _selectedLocation = location;
+      _locationController.text=location.latitude.toString()+","+location.longitude.toString();
     });
     getProperties(location);
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_selectedLocation,zoom: zoomLevel)));
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _mapController.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -311,35 +327,48 @@ class _MapScreenState extends State<MapScreen> {
               child: Column(children: [
                 Padding(
                   padding: const EdgeInsets.only(top:15.0,bottom: 1.0,left:20,right:20),
-                  child: TextField(
-                    controller: _locationController,
-                    onChanged: (value) async {
-                      await autoCompleteSearch(value);
-                      setState(() {});
-                    },
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      isDense: true,
-                      hintText: 'Enter a location...',
-                      labelStyle: const TextStyle(
-                        fontSize: 16, // Adjust as needed
-                        fontWeight: FontWeight.normal, // Adjust as needed
-                        color: Colors.black54, // Adjust as needed
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.black, // Adjust as needed
-                          width: 1.4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width/1.7,
+                        child: TextField(
+                          controller: _locationController,
+                          onChanged: (value) async {
+                            await autoCompleteSearch(value);
+                            setState(() {});
+                          },
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            isDense: true,
+                            hintText: 'Enter a location...',
+                            labelStyle: const TextStyle(
+                              fontSize: 16, // Adjust as needed
+                              fontWeight: FontWeight.normal, // Adjust as needed
+                              color: Colors.black54, // Adjust as needed
+                            ),
+                            // enabledBorder: OutlineInputBorder(
+                            //   borderSide: BorderSide(
+                            //     color: Colors.black, // Adjust as needed
+                            //     width: 1.4,
+                            //   ),
+                            //   borderRadius: const BorderRadius.only(
+                            //     bottomLeft: Radius.circular(0),
+                            //     bottomRight: Radius.circular(0),
+                            //     topLeft: Radius.circular(0),
+                            //     topRight: Radius.circular(0),
+                            //   ),
+                            // ),
+                          ),
                         ),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(8),
-                          bottomRight: Radius.circular(8),
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                        ),
                       ),
-                    ),
+                      if (_locationController.text!="")
+                    ElevatedButton.icon(onPressed: ()=>{
+                       setState(()=>{_locationController.text=""})
+                      },style:ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent),), icon: Icon(Icons.search_off_outlined), label: Text("Clear")
+                    )
+                    ],
                   ),
                 ),
                 _places.isNotEmpty? Container(
@@ -399,9 +428,9 @@ class _MapScreenState extends State<MapScreen> {
                                   _radius = newValue*1000;
                                 });
                                 setState(() {
-                                  _addMeMarker(_selectedLocation);
-                                  getProperties(_selectedLocation);
-                                  setState(() =>{_places=[]} );
+                                //   _addMeMarker(_selectedLocation);
+                                //   getProperties(_selectedLocation);
+                                  setState(() =>{_places=[],zoomLevel=calculateZoomLevel(_radius, _selectedLocation)} );
                                   _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_selectedLocation,zoom: zoomLevel)));
                                 });
                               },
@@ -412,14 +441,19 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
                 ),
-                SizedBox(width: 200,child: ElevatedButton.icon(onPressed: ()=>{
-                  _addMeMarker(_selectedLocation),
-                  getProperties(_selectedLocation),
-                  setState(() =>{_places=[]} ),
-                  _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_selectedLocation,zoom: zoomLevel)))
-                },style:ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.lightBlue)), icon: Icon(Icons.search), label: Text("Search"))),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(width: 200,child: ElevatedButton.icon(onPressed: ()=>{
+                      _addMeMarker(_selectedLocation),
+                      getProperties(_selectedLocation),
+                      setState(() =>{_places=[]} ),
+                    },style:ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.lightBlue)), icon: Icon(Icons.search), label: Text("Search"))),
+                  ],
+                ),
                 SizedBox(height: 10,)
               ]),
+              
             ),
             Container(
                 height: 300,
@@ -450,6 +484,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   },
                 ),
+                
               ),
             const SizedBox(height:20),
               Padding(

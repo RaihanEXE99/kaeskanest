@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:realestate/actions/action.dart';
-import "package:realestate/global.dart" as globals;
+import 'package:Kaeskanest/actions/action.dart';
+import "package:Kaeskanest/global.dart" as globals;
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:realestate/pages/components/appbar.dart';
-import 'package:realestate/pages/components/navbar.dart';
-import 'package:realestate/pages/components/userNavbar.dart';
-import 'package:realestate/pages/userNav/login.dart';
+import 'package:Kaeskanest/pages/components/appbar.dart';
+import 'package:Kaeskanest/pages/components/navbar.dart';
+import 'package:Kaeskanest/pages/components/userNavbar.dart';
+import 'package:Kaeskanest/pages/userNav/login.dart';
 
 import 'package:http/http.dart'as http;
 
@@ -101,7 +101,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
         }
         else{
           final Map<String, dynamic> gresponseData = json.decode(gresponse.body);
-          setState(() {
+          if(mounted){
+            setState(() {
             userId = responseData['id'];
             hasToken = true;
             pname.text = gresponseData['name'];
@@ -116,6 +117,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
             pint.text = gresponseData['pinterest'];
             pdes.text = gresponseData['description'];
           });
+          }
           return true;
         }
       }

@@ -1,10 +1,10 @@
 import 'dart:convert';
-import "package:realestate/global.dart" as globals;
+import "package:Kaeskanest/global.dart" as globals;
 import 'package:flutter/material.dart';
-import 'package:realestate/pages/components/navbar.dart';
-import 'package:realestate/pages/components/userNavbar.dart';
+import 'package:Kaeskanest/pages/components/navbar.dart';
+import 'package:Kaeskanest/pages/components/userNavbar.dart';
 import 'package:http/http.dart'as http;
-import 'package:realestate/pages/home.dart';
+import 'package:Kaeskanest/pages/home.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

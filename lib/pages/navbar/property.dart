@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
-import 'package:realestate/pages/userNav/login.dart';
+import 'package:Kaeskanest/pages/userNav/login.dart';
 
 import 'package:http/http.dart' as http;
 
-import "package:realestate/global.dart" as globals;
+import "package:Kaeskanest/global.dart" as globals;
 
 import 'package:chewie/chewie.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -70,9 +70,11 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           },
         );
         final Map<String, dynamic> pData = json.decode(pResponse.body);
-        setState(() {
-          _propertyDetails=pData;
-        });
+        if(mounted){
+          setState(() {
+            _propertyDetails=pData;
+          });
+        }
         List<String> tList = [];
         _propertyDetails['images'].forEach((e) => {
           tList=[...tList,"https://${globals.apiUrl}"+e['image']]

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:realestate/pages/home.dart';
-import 'package:realestate/pages/navbar/about.dart';
-import 'package:realestate/pages/navbar/contact.dart';
-import 'package:realestate/pages/navbar/property.dart';
-import 'package:realestate/pages/navbar/propertyList.dart';
-import 'package:realestate/pages/userNav/addAgent.dart';
-import 'package:realestate/pages/userNav/addProperty.dart';
-// import 'package:realestate/pages/userNav/agentSettings.dart';
-import 'package:realestate/pages/userNav/invitations.dart';
-import 'package:realestate/pages/userNav/login.dart';
-import 'package:realestate/pages/userNav/myAgents.dart';
-import 'package:realestate/pages/userNav/myProperty.dart';
-// import 'package:realestate/pages/userNav/organizationSettings.dart';
-import 'package:realestate/pages/userNav/profileSettings.dart';
-import 'package:realestate/pages/userNav/register.dart';
-import 'package:realestate/pages/userNav/settigns.dart';
+import 'package:Kaeskanest/pages/home.dart';
+import 'package:Kaeskanest/pages/navbar/about.dart';
+import 'package:Kaeskanest/pages/navbar/contact.dart';
+import 'package:Kaeskanest/pages/navbar/property.dart';
+import 'package:Kaeskanest/pages/navbar/propertyList.dart';
+import 'package:Kaeskanest/pages/userNav/addAgent.dart';
+import 'package:Kaeskanest/pages/userNav/addProperty.dart';
+// import 'package:Kaeskanest/pages/userNav/agentSettings.dart';
+import 'package:Kaeskanest/pages/userNav/invitations.dart';
+import 'package:Kaeskanest/pages/userNav/login.dart';
+import 'package:Kaeskanest/pages/userNav/myAgents.dart';
+import 'package:Kaeskanest/pages/userNav/myProperty.dart';
+// import 'package:Kaeskanest/pages/userNav/organizationSettings.dart';
+import 'package:Kaeskanest/pages/userNav/profileSettings.dart';
+import 'package:Kaeskanest/pages/userNav/register.dart';
+import 'package:Kaeskanest/pages/userNav/settigns.dart';
 
 void main() {
   runApp(const MyApp());

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:realestate/pages/components/navbar.dart';
-import 'package:realestate/pages/components/userNavbar.dart';
+import 'package:Kaeskanest/pages/components/navbar.dart';
+import 'package:Kaeskanest/pages/components/userNavbar.dart';
 
 class RegSuccess extends StatelessWidget {
   const RegSuccess({super.key});

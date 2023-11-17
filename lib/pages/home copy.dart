@@ -44,8 +44,15 @@ class Place {
 class _HomePageState extends State<HomePage> {
   String selectedSaleOption = 'Rent';
   String selectedHomeOption = 'Home';
+  // String selectedTypeValue = 'Sale';
+  // String selectedCategoryValue = 'Home';
 
   final _locationController = TextEditingController();
+
+  late GoogleMapController _mapController;
+  var _currentPosition;
+
+  Uint8List? markerIcon;
 
   List<Place> _places = [];
 
@@ -65,6 +72,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _getCurrentPosition();
     _loadProperties();
   }
   Future<void> _loadProperties() async {
@@ -132,6 +140,200 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+  }
+  
+  void _getCurrentPosition() async {
+    final tmpImg = await getBytesFromAsset('assets/map/boy.png', 125);
+    if(mounted){
+      setState(() {
+        markerIcon=tmpImg;
+      });
+    }
+    // Get the current position using geolocator package
+    final loc = await Permission.location.request();
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    if (mounted){
+      setState(() {
+        // Set the current position as a LatLng object
+        _currentPosition = LatLng(position.latitude, position.longitude);
+        Marker newMarker = Marker(
+            markerId: MarkerId("Current location"),
+            position: _currentPosition,
+            icon: BitmapDescriptor.fromBytes(markerIcon!),
+            onTap: () => {
+              print("This is your current location!")
+            },
+          );
+
+        setState(() {
+          _markers.add(newMarker);
+        });
+        zoomLevel = calculateZoomLevel(_radius,LatLng(position.latitude, position.longitude));
+        getProperties(LatLng(position.latitude, position.longitude));
+      });
+    }
+  }
+
+  double calculateZoomLevel(double radius, LatLng center) {
+      // Assuming the Earth's radius is approximately 6371 kilometers
+      double earthRadius = 6371.0;
+
+      // Convert radius to radians
+      double radiusInRadians = radius / earthRadius;
+
+      // Calculate the angular distance on the Earth's surface
+      double centralAngle = 2 * asin(sqrt(pow(sin(radiusInRadians / 2), 2) +
+          cos(center.latitude * (pi / 180)) *
+              cos(center.latitude * (pi / 180)) *
+              pow(sin(radiusInRadians / 2), 2)));
+
+      // Calculate the zoom level based on the central angle
+      double zoomLevel = 12.2 - (log(centralAngle) / log(2));
+
+      return zoomLevel;
+    }
+  double zoomLevel = 0.0;
+
+  void _onMapCreated(GoogleMapController controller) {
+    // Set the map controller when the map is created
+    _mapController = controller;
+  }
+
+  Future<void> getProperties(LatLng location) async {
+    _clearMarkers();
+    Future<http.Response> getRecProperties(LatLng location) async {
+      // final url = Uri.parse("https://" + globals.apiUrl + '/api/search/`');
+      final headers = {
+        'Content-Type': 'application/json',
+      };
+      final Map<String, dynamic> queryParams = {
+        "type": selectedSaleOption,
+        "category": selectedHomeOption,
+        "lat": location.latitude.toString(),
+        "long": location.longitude.toString(),
+        "radius": (_radius/1000).toString(),
+      };
+      final String url = "https://" + globals.apiUrl + '/api/search/';
+      final String queryString = Uri(queryParameters: queryParams).query;
+      final String requestUrl = '$url?$queryString';
+      print(requestUrl);
+      final response = await http.get(Uri.parse(requestUrl), headers: headers,);
+      return response;
+    }
+    final response = await getRecProperties(_currentPosition);
+
+    if (response.statusCode < 303) {
+      final List<dynamic> responseData = json.decode(response.body);
+      print(responseData.runtimeType);
+      for (Map<String, dynamic> item in responseData) {
+        _addMarker(LatLng(item['lat'], item['long']));
+      }
+      // responseData.forEach((e) => {
+      //   print(e.runtimeType),
+      //   print(e)
+      // });
+      // _addMarker(LatLng(double.parse(responseData.lat), responseData['long']));
+    }else if(response.statusCode < 510){
+      print("Error! 400");
+      final String encodeFirst = json.encode(response.body);
+      var data = json.decode(encodeFirst);
+      print(data);
+    }else{
+      print("Server Error! 500");
+    }
+  }
+
+  void _addMarker(LatLng position) async {
+    Future<Uint8List> getBytesFromAsset(String path, int width) async {
+      ByteData data = await rootBundle.load(path);
+      ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+      ui.FrameInfo fi = await codec.getNextFrame();
+      return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+    }
+    final tmpImg = await getBytesFromAsset('assets/map/houseIcon.png', 180);
+    Marker newMarker = Marker(
+      markerId: MarkerId(position.toString()),
+      position: position,
+      // infoWindow: InfoWindow(title: 'New Marker', snippet: 'This is a new marker'),
+      icon: BitmapDescriptor.fromBytes(tmpImg!),
+      onTap: () => {
+        getPropertiesModelCLicked(position,context),
+        
+      },
+    );
+
+    if(mounted){
+      setState(() {
+        _markers.add(newMarker);
+      });
+    }
+      // _mapController.animateCamera(CameraUpdate.newLatLng(position));
+  }
+
+  Future<void> getPropertiesModelCLicked(LatLng location,context) async {
+    setState(() {
+      zoomLevel = calculateZoomLevel(_radius,location);
+    });
+    Marker newMarker = Marker(
+      markerId: MarkerId(location.toString()),
+      position: location,
+      // infoWindow: InfoWindow(title: 'New Marker', snippet: 'This is a new marker'),
+    );
+    Future<http.Response> getRecProperties(LatLng location) async {
+      // final url = Uri.parse("https://" + globals.apiUrl + '/api/search/`');
+      final headers = {
+        'Content-Type': 'application/json',
+      };
+      final Map<String, dynamic> queryParams = {
+        "type": selectedSaleOption,
+        "category": selectedHomeOption,
+        "lat": location.latitude.toString(),
+        "long": location.longitude.toString(),
+        "radius": ((_radius/1000)/50).toString(),
+      };
+      print(queryParams);
+      final String url = "https://" + globals.apiUrl + '/api/search/';
+      final String queryString = Uri(queryParameters: queryParams).query;
+      final String requestUrl = '$url?$queryString';
+      print(requestUrl);
+      final response = await http.get(Uri.parse(requestUrl), headers: headers,);
+      return response;
+    }
+    final response = await getRecProperties(location);
+
+    if (response.statusCode < 303) {
+      final List<dynamic> responseData = json.decode(response.body);
+      if(mounted){
+        setState(() {
+          searchedProperties=responseData;
+        });
+      }
+      print(responseData);
+      print(responseData.runtimeType);
+      _showBottomDrawer(context,location);
+    }else if(response.statusCode < 510){
+      print("Error! 400");
+      final String encodeFirst = json.encode(response.body);
+      var data = json.decode(encodeFirst);
+      print(data);
+    }else{
+      print("Server Error! 500");
+    }
+  }
+
+  void _clearMarkers() {
+    setState(() {
+      _markers = {};
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     
@@ -146,11 +348,48 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [ 
             Container(
+              height: 300,
+              color: Colors.white60,
+              child: _currentPosition == null
+              ? Center(child: CircularProgressIndicator())
+              : GoogleMap(
+                  gestureRecognizers: {                 
+                    Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer())
+                  },
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: _currentPosition,
+                    zoom: zoomLevel,
+                    tilt: 45,
+                  ),
+                  mapType: MapType.normal,
+                  markers: _markers,
+                  // {
+                  //   Marker(
+                  //     markerId: MarkerId('current'),
+                  //     position: _currentPosition,
+                  //     icon: BitmapDescriptor.fromBytes(markerIcon!)
+                  //   ),
+                  // },
+                  circles: {
+                  Circle(
+                    circleId: CircleId('radius'),
+                    center: _currentPosition,
+                    radius: _radius, // 10 km in meters
+                    strokeWidth: 2,
+                    strokeColor: Colors.blue,
+                    fillColor: Colors.blue.withOpacity(0.2),
+                  ),
+                },
+              ),
+            ),
+            
+            Container(
               decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/app/bgImage.jpg'), // Replace with your image path
-                  fit: BoxFit.cover,
-                ),
+                // image: DecorationImage(
+                //   image: AssetImage('assets/app/bgImage.jpg'), // Replace with your image path
+                //   fit: BoxFit.cover,
+                // ),
               ),
               child: Container(
                 margin: EdgeInsets.only(top:30,bottom:30,left:20,right:20), 
@@ -181,7 +420,41 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    
+                    Padding(
+                      padding: const EdgeInsets.all(3.0),
+                      child: Container(
+                        color: Colors.white,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _places.length>4?4:_places.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text(_places[index].name),
+                              subtitle: Text(_places[index].vicinity),
+                              onTap: () {
+                                setState(() {
+                                  _locationController.text = _places[index].name;
+                                  _currentPosition = LatLng(_places[index].lat, _places[index].long);
+                                  _mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_currentPosition,zoom: zoomLevel)));
+                                  getProperties(_currentPosition = LatLng(_places[index].lat, _places[index].long));
+                                  // point();
+                                });
+                                setState(() {
+                                  _places = [];
+                                });
+                                setState(() {
+                                  scrollController.animateTo(
+                                    0,
+                                    duration: Duration(seconds: 1), // Duration of the scroll animation
+                                    curve: Curves.ease,
+                                  );
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(top:20),
                       child: Row(
@@ -292,7 +565,8 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton(
                               onPressed: () {
                                 setState(() {
-                                  // MAIN
+                                  _places = [];
+                                  _locationController.text = "";
                                 });
                               },
                               style: ElevatedButton.styleFrom(
@@ -308,8 +582,10 @@ class _HomePageState extends State<HomePage> {
                               ),
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                                child: Icon(
-                                  Icons.search
+                                child: _locationController.text.isEmpty?
+                                const Icon(Icons.search)
+                                :Icon(
+                                  Icons.search_off
                                 )
                               ),
                             ),
@@ -317,37 +593,6 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),  
-                    Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Container(
-                        color: Colors.white,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _places.length>4?4:_places.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(_places[index].name),
-                              subtitle: Text(_places[index].vicinity),
-                              onTap: () {
-                                setState(() {
-                                  _locationController.text = _places[index].name;
-                                });
-                                setState(() {
-                                  _places = [];
-                                });
-                                setState(() {
-                                  scrollController.animateTo(
-                                    0,
-                                    duration: Duration(seconds: 1), // Duration of the scroll animation
-                                    curve: Curves.ease,
-                                  );
-                                });
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
                     SizedBox(height: 20,),
                   ],
                 ),
@@ -377,9 +622,50 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
+            // Padding(
+            //   padding: const EdgeInsets.only(top:40),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: [
+            //       Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Text(
+            //             'Select Type:', // Your label text
+            //             style: TextStyle(
+            //               fontSize: 16, // Adjust label font size as needed
+            //               fontWeight: FontWeight.normal, // Adjust label font weight as needed
+            //               color: Colors.black54, // Adjust label text color as needed
+            //             ),
+            //           ),
+            //           _typeDropdown(),
+            //         ]
+            //       ),
+            //       Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Text(
+            //             'Select Category:', // Your label text
+            //             style: TextStyle(
+            //               fontSize: 16, // Adjust label font size as needed
+            //               fontWeight: FontWeight.normal, // Adjust label font weight as needed
+            //               color: Colors.black54, // Adjust label text color as needed
+            //             ),
+            //           ),
+            //           _categoryDropdown(),
+            //         ]
+            //       ),
+            //     ],
+            //   ),
+            // ),
             const SizedBox(height:20),
             Padding(
               padding: const EdgeInsets.all(15),
+              // child: Column(
+              //   children: [
+              //     _propertyCard(context),
+              //   ],
+              // ),
               child: ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -413,8 +699,8 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Column(
                 children: [
-                  Image.network(
-                    "https://${globals.apiUrl}"+ppt['thumbnail'],
+                  Image.asset(
+                    "assets/img/cardimage.jpg",
                     height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -556,26 +842,48 @@ class _HomePageState extends State<HomePage> {
                         ),
                         // Add a row with two buttons spaced apart and aligned to the right side of the card
                         Container(height: 15),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(Icons.more_horiz_rounded),
-                            style: TextButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            // Add a text button labeled "SHARE" with transparent foreground color and an accent color for the text
+                            ElevatedButton.icon(
+                              icon: Icon(
+                                Icons.timelapse,
+                                color: Colors.black54,
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0.0,
+                                shadowColor: Colors.transparent,
+                                backgroundColor: Colors.white,
+                              ),
+                              label: Text(
+                                ppt['date'].substring(0, 10),
+                                style: TextStyle(
+                                  color: Colors.black54
+                                  ),
+                              ),
+                              onPressed: () {},
                             ),
-                            label: Text(
-                              "Details",
-                              style: TextStyle(color: Colors.white),
+                            // Add a text button labeled "EXPLORE" with transparent foreground color and an accent color for the text
+                            ElevatedButton.icon(
+                              icon: Icon(Icons.more_horiz_rounded),
+                              style: TextButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                              ),
+                              label: Text(
+                                "Details",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PropertyDetails(propertyID: ppt["sku"]),
+                                  ),
+                                );
+                              },
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PropertyDetails(propertyID: ppt["sku"]),
-                                ),
-                              );
-                            },
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -671,6 +979,127 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  void _showBottomDrawer(BuildContext context,ppt) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+            color: Colors.black,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: searchedProperties.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title:  _propertyCard(context,searchedProperties[index]),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.white)),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Close',style: TextStyle(color: Colors.black,fontSize: 15)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  // Container _categoryDropdown() {
+  //   return Container(
+  //     width: 150,
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       border: Border.all(
+  //         width: 2.0,         
+  //       ),
+  //       borderRadius: BorderRadius.circular(8.0),
+  //     ),
+  //     child: Padding(
+  //       padding: const EdgeInsets.only(left: 8),
+  //       child: DropdownButton<String>(
+  //         icon: Container(),
+  //         underline: Container(),
+  //         value: selectedCategoryValue,
+  //         elevation: 0,
+  //         borderRadius: BorderRadius.circular(10),
+  //         onChanged: (String? newValue) {
+  //           setState(() {
+  //             selectedCategoryValue = newValue!;
+  //           });
+  //         },
+  //         style: const TextStyle(
+  //           fontWeight: FontWeight.w500,
+  //           fontSize: 15,
+  //           color: Colors.black,
+  //         ),
+  //           items: <String>['Home', 'Office', 'Appartment']
+  //               .map<DropdownMenuItem<String>>((String value) {
+  //             return DropdownMenuItem<String>(
+  //               value: value,
+  //               child: Text(value),
+  //             );
+  //           }).toList(),
+  //         ),
+  //     ),
+  //   );
+  // }
+
+  // Container _typeDropdown() {
+  //   return Container(
+  //     width: 150,
+  //     decoration: BoxDecoration(
+  //       border: Border.all(
+  //         color: const Color(0xffE0E3E7),
+  //         width: 2.0,         
+  //       ),
+  //       borderRadius: BorderRadius.circular(8.0),
+  //     ),
+  //     child: Padding(
+  //       padding: const EdgeInsets.only(left: 8),
+  //       child: DropdownButton<String>(
+  //         icon: Container(),
+  //         underline: Container(),
+  //         value: selectedTypeValue,
+  //         elevation: 0,
+  //         borderRadius: BorderRadius.circular(10),
+  //         onChanged: (String? newValue) {
+  //           setState(() {
+  //             selectedTypeValue = newValue!;
+  //           });
+  //         },
+  //         style: const TextStyle(
+  //           fontWeight: FontWeight.w500,
+  //           fontSize: 15,
+  //           color: Colors.black45,
+  //         ),
+  //           items: <String>['Sale', 'Rent']
+  //               .map<DropdownMenuItem<String>>((String value) {
+  //             return DropdownMenuItem<String>(
+  //               value: value,
+  //               child: Text(value),
+  //             );
+  //           }).toList(),
+  //         ),
+  //     ),
+  //   );
+  // }
 
   AppBar _appBar(BuildContext context) {
     return AppBar(

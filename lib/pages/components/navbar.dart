@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:realestate/pages/navbar/property.dart';
+import 'package:Kaeskanest/pages/navbar/property.dart';
 
 class Navbar extends StatelessWidget {
   const Navbar({super.key});
