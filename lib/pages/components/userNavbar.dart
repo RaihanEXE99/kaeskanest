@@ -155,16 +155,6 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
             },
           )]
         else...[
-           ListTile(
-            leading: Icon(
-              Icons.search_rounded,
-              color: Colors.black,
-              ),
-            title: const Text('Property List'),
-            onTap: ()=> {
-              Navigator.pushNamed(context, "/propertyList")
-            },
-          ),
           ListTile(
             leading: Icon(
               Icons.settings_outlined,

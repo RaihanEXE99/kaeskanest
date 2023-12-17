@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
         '/login':(context) => Login(),
         '/register':(context) => Register(),
         '/settings':(context) => Settings(),
-        "/propertyList":(context)=> MapScreen(),
+        "/propertyList":(context)=> MapScreen(lat: 0, long: 0, postType: '', propertyCategory: '', pLocation: '', initNeed: false),
         "/profileSettings":(context)=> ProfileSettings(),
         "/addAgent":(context)=> AddAgent(),
         "/myProperty":(context)=> MyProperty(),

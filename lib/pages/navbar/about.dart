@@ -30,6 +30,16 @@ class _AboutState extends State<About> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Container(
+              width: double.infinity,
+              height: 300,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/app/about.jpg'), // Replace with your image path
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
             Center(
               child: Text(
                 "Our Team",

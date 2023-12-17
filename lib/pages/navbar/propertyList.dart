@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:ffi';
+// import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -25,9 +25,17 @@ import 'package:Kaeskanest/global.dart' as globals;
 import 'package:Kaeskanest/pages/navbar/property.dart';
 
 class MapScreen extends StatefulWidget {
+  final double lat;
+  final double long;
+  final String postType;
+  final String propertyCategory;
+  final String pLocation;
+  final bool initNeed;
+  MapScreen({required this.lat,required this.long, required this.postType, required this.propertyCategory, required this.pLocation, required this.initNeed});
   @override
   _MapScreenState createState() => _MapScreenState();
 }
+
 class Place {
   final String name;
   final String vicinity;
@@ -61,7 +69,36 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    _getCurrentPosition();
+    if(widget.initNeed){
+      _cameFromHomePage();
+    }else{
+      _getCurrentPosition();
+    }
+  }
+  void _cameFromHomePage() async {
+    if (mounted){
+      setState(() {
+        // Set the current position as a LatLng object
+        _selectedLocation = LatLng(widget.lat, widget.long);
+        Marker newMarker = Marker(
+            markerId: MarkerId("Current location"),
+            position: _selectedLocation,
+            onTap: () => {
+              print("This is your current location!")
+            },
+          );
+
+        setState(() {
+          _markers.add(newMarker);
+          zoomLevel = calculateZoomLevel(_radius,LatLng(widget.lat, widget.long));
+          _locationController.text=widget.pLocation;
+          selectedSaleOption = widget.postType;
+          selectedHomeOption = widget.propertyCategory;
+          _selectedLocation = LatLng(widget.lat, widget.long);
+        });
+        getProperties(_selectedLocation);
+      });
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -239,9 +276,11 @@ class _MapScreenState extends State<MapScreen> {
       for (Map<String, dynamic> item in responseData) {
         _addMarker(LatLng(item['lat'], item['long']));
       }
-      setState(() {
-        _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_selectedLocation,zoom: zoomLevel)));
-      });
+      if(mounted){
+        setState(() {
+          _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_selectedLocation,zoom: zoomLevel)));
+        });
+      }
       // _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:_selectedLocation,zoom: zoomLevel)));
     }else if(response.statusCode < 510){
       print("Error! 400");

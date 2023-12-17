@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'dart:ffi';
+// import 'dart:ffi';
 import 'dart:math';
 
+import 'package:Kaeskanest/pages/navbar/propertyList.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,9 @@ import 'dart:async';
 import 'dart:typed_data'; 
 import 'dart:ui' as ui;
 
-import 'package:Kaeskanest/pages/navbar/property.dart'; 
+import 'package:Kaeskanest/pages/navbar/property.dart';
+
+
 
 
 class HomePage extends StatefulWidget {
@@ -55,12 +58,10 @@ class _HomePageState extends State<HomePage> {
 
   final String apiKey = globals.apiKey;
 
-  final double _radius = 3500;
-
-  Set<Marker> _markers = Set();
-
   var properties = [];
   var searchedProperties = [];
+
+  LatLng sendLocation=LatLng(0, 0) ;
 
   @override
   void initState() {
@@ -293,6 +294,12 @@ class _HomePageState extends State<HomePage> {
                               onPressed: () {
                                 setState(() {
                                   // MAIN
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MapScreen(lat: sendLocation.latitude, long: sendLocation.longitude, postType: selectedSaleOption, propertyCategory: selectedHomeOption, pLocation: _locationController.text, initNeed: true,),
+                                    ),
+                                  );
                                 });
                               },
                               style: ElevatedButton.styleFrom(
@@ -331,6 +338,7 @@ class _HomePageState extends State<HomePage> {
                               onTap: () {
                                 setState(() {
                                   _locationController.text = _places[index].name;
+                                  sendLocation = LatLng(_places[index].lat, _places[index].long);
                                 });
                                 setState(() {
                                   _places = [];
@@ -390,6 +398,20 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0,0,0,30),
+              child: SizedBox(
+                width: 200,
+                child: ElevatedButton(onPressed: ()=>{
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MapScreen(lat: 0, long: 0, postType: '', propertyCategory: '', pLocation: '', initNeed: false,),
+                    ),
+                  )
+                }, child: Text("Load More",style: TextStyle(fontSize: 20),)),
+              ),
             )
           ]
         ),
@@ -413,12 +435,13 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Column(
                 children: [
-                  Image.network(
-                    "https://${globals.apiUrl}"+ppt['thumbnail'],
-                    height: 160,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  ImageLoader(imageUrl: "https://${globals.apiUrl}"+ppt['thumbnail'],),
+                  // Image.network(
+                  //   "https://${globals.apiUrl}"+ppt['thumbnail'],
+                  //   height: 160,
+                  //   width: double.infinity,
+                  //   fit: BoxFit.cover,
+                  // ),
                   Container(
                     padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
                     child: Column(
@@ -457,7 +480,7 @@ class _HomePageState extends State<HomePage> {
                         // Display the card's title using a font size of 24 and a dark grey color
                         Row(
                           children: [
-                            Icon(Icons.maps_home_work_sharp),
+                            Icon(Icons.maps_home_work_sharp,color: Theme.of(context).colorScheme.primary),
                             SizedBox(width: 10,),
                             Expanded(
                               child: Text(
@@ -467,7 +490,7 @@ class _HomePageState extends State<HomePage> {
                                 softWrap: false,
                                 style: TextStyle(
                                   fontSize: 24,
-                                  color: Colors.grey[700],
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontWeight:FontWeight.w500
                                 ),
                               ),
@@ -714,6 +737,38 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ]
+    );
+  }
+}
+
+class ImageLoader extends StatelessWidget {
+  final String imageUrl;
+
+  ImageLoader({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: precacheImage(NetworkImage(imageUrl), context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // Image successfully loaded
+          return Image.network(imageUrl,
+            height: 160,
+            width: double.infinity,
+            fit: BoxFit.cover
+          );
+        } else if (snapshot.hasError) {
+          // Error loading image
+          return Text('Error loading image');
+        } else {
+          // Image is still loading
+          return Padding(
+            padding: const EdgeInsets.all(25),
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 }

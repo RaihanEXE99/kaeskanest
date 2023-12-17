@@ -1,3 +1,4 @@
+import 'package:Kaeskanest/pages/navbar/propertyList.dart';
 import 'package:flutter/material.dart';
 import 'package:Kaeskanest/pages/navbar/property.dart';
 
@@ -31,6 +32,32 @@ class Navbar extends StatelessWidget {
               indent: 20,
               endIndent: 20,
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(25,0,25,10),
+            child: ElevatedButton.icon(
+              icon: Icon(
+                Icons.search_rounded,
+                color: Colors.white,
+                size: 30,
+                ),
+              label: Padding(
+                padding: const EdgeInsets.fromLTRB(0,10,0,10),
+                child: const Text('Search Property',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
+              ),
+              onPressed: ()=> {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MapScreen(lat: 0, long: 0, postType: '', propertyCategory: '', pLocation: '', initNeed: false,),
+                  ),
+                )
+              },
+            ),
+          ),
+          Divider(
+            indent: 20,
+            endIndent: 20,
           ),
           ListTile(
             leading: Icon(

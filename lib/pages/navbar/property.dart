@@ -17,7 +17,9 @@ import 'package:video_player/video_player.dart';
 
 class PropertyDetails extends StatefulWidget {
   final String propertyID;
+
   PropertyDetails({required this.propertyID});
+  
   @override
   _PropertyDetailsState createState() => _PropertyDetailsState();
 }
@@ -39,34 +41,11 @@ class _PropertyDetailsState extends State<PropertyDetails> {
 
 
     Future<bool> _checkAccessTokenOnce() async {
-    var token = await secureStorage.read(key: 'access');
-    if (token != null) {
-      final response = await http.get(
-        Uri.parse("https://" + globals.apiUrl + '/api/users/me/'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'JWT $token',
-        },
-      );
-      if (response.statusCode>=400){
-        await secureStorage.deleteAll();
-        setState(() {
-          token=null;
-        });
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => Login(), // Replace with your login screen
-          ),
-        );
-        return false;
-      }
-      else{
         // final Map<String, dynamic> responseData = json.decode(response.body);
         final pResponse = await http.get(
         Uri.parse("https://" + globals.apiUrl + '/api/property/${propertyID}'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'JWT $token',
           },
         );
         final Map<String, dynamic> pData = json.decode(pResponse.body);
@@ -87,7 +66,6 @@ class _PropertyDetailsState extends State<PropertyDetails> {
         Uri.parse("https://" + globals.apiUrl + '/api/agentDetails/${aid.toString()}/'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'JWT $token',
           },
         );
         final Map<String, dynamic> ares = json.decode(agentResponse.body);
@@ -95,17 +73,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           uploadedBy=ares;
         });
         return true;
-      }
-    } else {
-      // Access token doesn't exist, navigate to the login or onboarding screen
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Login(), // Replace with your login screen
-        ),
-      );
-      return false;
     }
-  }
   late final Future<bool> _checkAccessTokenFuture = _checkAccessTokenOnce();
   @override
   Widget build(BuildContext context) {
@@ -510,11 +478,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
     );
   }
   _launchURL(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 }
 
