@@ -100,6 +100,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                     Container(
                       child: GestureDetector(
                         onTap: () {
+                          print("https://${globals.apiUrl}"+_propertyDetails['thumbnail']);
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => HeroDetailPage(imageUrl: "https://${globals.apiUrl}"+_propertyDetails['thumbnail']),
@@ -107,7 +108,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                           );
                         },
                         child: Hero(
-                          tag: "thumbnail", // Unique tag for each image
+                          tag: "https://${globals.apiUrl}"+_propertyDetails['thumbnail'], // Unique tag for each image
                           child: Container(
                             width: MediaQuery.of(context).size.width,
                             // margin: EdgeInsets.symmetric(horizontal: 5.0),
@@ -135,6 +136,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                         ),
                       ),
                     ),
+                    
                     Container(
                       child: Padding(
                         padding: const EdgeInsets.only(top:8.0,bottom: 8),
@@ -160,40 +162,41 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                                       ),
                                     );
                                   },
-                                  child: Hero(
-                                    tag: url, // Unique tag for each image
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black,
-                                      ),
-                                      child: Image.network(
-                                        url,
-                                        fit: BoxFit.cover,
-                                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child; // If the image is already loaded, show it
-                                          } else {
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                value: loadingProgress.expectedTotalBytes != null
-                                                    ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
-                                                    : null,
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      ),
+                                  child: 
+                                  Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                    child: Image.network(
+                                      url,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child; // If the image is already loaded, show it
+                                        } else {
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              value: loadingProgress.expectedTotalBytes != null
+                                                  ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                                  : null,
+                                            ),
+                                          );
+                                        }
+                                      },
                                     ),
                                   ),
+                                
                                 );
                               },
                             );
                           }).toList(),
                         ),
+                      
                       ),
                     )
+
                   ]),
                 ),
                 SizedBox(
