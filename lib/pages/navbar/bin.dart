@@ -20,14 +20,7 @@ class MapScreen extends StatefulWidget {
   final String propertyCategory;
   final String pLocation;
   final bool initNeed;
-  MapScreen({
-    required this.lat,
-    required this.long,
-    required this.postType,
-    required this.propertyCategory,
-    required this.pLocation,
-    required this.initNeed,
-  });
+  MapScreen({required this.lat, required this.long, required this.postType, required this.propertyCategory, required this.pLocation, required this.initNeed});
   @override
   _MapScreenState createState() => _MapScreenState();
 }
@@ -39,23 +32,17 @@ class Place {
   final double lat;
   final double long;
 
-  Place({
-    required this.name,
-    required this.vicinity,
-    required this.placeId,
-    required this.lat,
-    required this.long,
-  });
+  Place({required this.name, required this.vicinity, required this.placeId, required this.lat, required this.long});
 }
 
 class _MapScreenState extends State<MapScreen> {
   final String apiKey = globals.apiKey;
   late GoogleMapController _mapController;
   var _selectedLocation = LatLng(0, 0);
-  // Set<Marker> _markers = Set();
+  Set<Marker> _markers = Set();
 
-  double _radius = 5 * 1000;
-  double zoomLevel = 11;
+  double _radius = 1 * 1000;
+  double zoomLevel = 10;
 
   final TextEditingController _locationController = TextEditingController();
   List<Place> _places = [];
@@ -67,11 +54,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Uint8List? markerIcon;
 
-  double sliderValue = 5.0;
-
-  Set<Marker> _markers = Set();
-  Set<Polygon> _polygons = Set();
-  List<LatLng> _polygonPoints = [];
+  double sliderValue = 1.0;
 
   @override
   void initState() {
@@ -90,10 +73,11 @@ class _MapScreenState extends State<MapScreen> {
         Marker newMarker = Marker(
           markerId: MarkerId("Current location"),
           position: _selectedLocation,
+          onTap: () => {print("This is your current location!")},
         );
 
         setState(() {
-          // _markers.add(newMarker);
+          _markers.add(newMarker);
           zoomLevel = calculateZoomLevel(_radius, LatLng(widget.lat, widget.long));
           _locationController.text = widget.pLocation;
           selectedSaleOption = widget.postType;
@@ -112,7 +96,7 @@ class _MapScreenState extends State<MapScreen> {
   double calculateZoomLevel(double radius, LatLng center) {
     double earthRadius = 6371.0;
     double radiusInRadians = radius / earthRadius;
-    double zoomLevel = 11 - log(radiusInRadians) / log(2);
+    double zoomLevel = 10 - log(radiusInRadians) / log(2);
     return zoomLevel;
   }
 
@@ -179,9 +163,10 @@ class _MapScreenState extends State<MapScreen> {
         Marker newMarker = Marker(
           markerId: const MarkerId("Current location"),
           position: _selectedLocation,
+          onTap: () => {print("This is your current location!")},
         );
         setState(() {
-          // _markers.add(newMarker);
+          _markers.add(newMarker);
           zoomLevel = calculateZoomLevel(_radius, LatLng(position.latitude, position.longitude));
         });
         getProperties(_selectedLocation);
@@ -266,128 +251,14 @@ class _MapScreenState extends State<MapScreen> {
 
     if (mounted) {
       setState(() {
-        // _markers.add(newMarker);
+        _markers.add(newMarker);
       });
     }
   }
 
-  void _clearPolygon() {
-    setState(() {
-      _polygonPoints.clear();
-      _updatePolygons();
-    });
-  }
-
-
-  void _updatePolygons() {
-    if (_polygonPoints.length > 2) {
-      _polygons.clear();
-      _polygons.add(
-        Polygon(
-          polygonId: PolygonId('searchArea'),
-          points: _polygonPoints,
-          strokeWidth: 2,
-          strokeColor: Colors.blue,
-          fillColor: Colors.blue.withOpacity(0.3),
-        ),
-      );
-    } else {
-      _polygons.clear();
-    }
-  }
-
-  void _drawPolygon() {
-    if (_polygonPoints.length > 2) {
-      // Get the bounds of the drawn polygon
-      LatLngBounds bounds = _getPolygonBounds(_polygonPoints);
-
-      // Perform a search within the bounds of the drawn polygon
-      getPropertiesWithinBounds(bounds);
-
-      // Optionally, you can clear the drawn polygon points
-      setState(() {
-        // _polygonPoints.clear();
-        _updatePolygons();
-      });
-    } else {
-      // Inform the user that the polygon needs at least 3 points
-      // or take any other necessary action
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please draw a complete polygon with at least 3 points. You can draw polygone by tapping on the map!'),
-        ),
-      );
-    }
-  }
-  
-  LatLngBounds _getPolygonBounds(List<LatLng> polygonPoints) {
-    double minLat = polygonPoints[0].latitude;
-    double maxLat = polygonPoints[0].latitude;
-    double minLng = polygonPoints[0].longitude;
-    double maxLng = polygonPoints[0].longitude;
-
-    for (LatLng point in polygonPoints) {
-      if (point.latitude < minLat) minLat = point.latitude;
-      if (point.latitude > maxLat) maxLat = point.latitude;
-      if (point.longitude < minLng) minLng = point.longitude;
-      if (point.longitude > maxLng) maxLng = point.longitude;
-    }
-
-    return LatLngBounds(
-      southwest: LatLng(minLat, minLng),
-      northeast: LatLng(maxLat, maxLng),
-    );
-  }
-
-  void getPropertiesWithinBounds(LatLngBounds bounds) async {
-    double minLat = bounds.southwest.latitude;
-    double maxLat = bounds.northeast.latitude;
-    double minLng = bounds.southwest.longitude;
-    double maxLng = bounds.northeast.longitude;
-
-    final type = selectedSaleOption;
-    final cat = selectedHomeOption;
-
-    final headers = {
-        'Content-Type': 'application/json',
-      };
-    final Map<String, dynamic> queryParams = {
-      "minlat": minLat.toString(),
-      "maxlat": maxLat.toString(),
-      "minlong": minLng.toString(),
-      "maxlong": maxLng.toString(),
-      "type": type,
-      "category": cat,
-    };
-    final String url = 'https://' + globals.apiUrl + '/api/polygon/';
-    final String queryString = Uri(queryParameters: queryParams).query;
-    final String requestUrl = '$url?$queryString';
-    final response = await http.get(Uri.parse(requestUrl), headers: headers,);
-
-    if (response.statusCode == 200) {
-      final List<dynamic> responseData = json.decode(response.body);
-      if (mounted) {
-        setState(() {
-          properties = responseData;
-          // zoomLevel = calculateZoomLevel(_radius, bounds.getCenter());
-        });
-      }
-      _clearMarkers();
-      for (Map<String, dynamic> item in responseData) {
-        _addMarker(LatLng(item['lat'], item['long']));
-      }
-      if (mounted) {
-        setState(() {
-          // _mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: bounds.getCenter(), zoom: zoomLevel)));
-        });
-      }
-      print(responseData.length);
-    } else {
-      // Handle errors
-      print("Error! ${response.statusCode}");
-      final String encodeFirst = json.encode(response.body);
-      var data = json.decode(encodeFirst);
-      print(data);
+  void _addMeMarker(LatLng position) async {
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -395,6 +266,22 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       _markers = {};
     });
+  }
+
+  void _onMapTapped(LatLng location) {
+    _addMeMarker(location);
+    setState(() {
+      _selectedLocation = location;
+      _locationController.text = location.latitude.toString() + "," + location.longitude.toString();
+    });
+    getProperties(location);
+    _mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _selectedLocation, zoom: zoomLevel)));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _mapController.dispose();
   }
 
   @override
@@ -437,10 +324,10 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       if (_locationController.text != "")
                         ElevatedButton.icon(
-                          onPressed: () => {setState(() => _locationController.text = "")},
-                          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent),),
-                          icon: Icon(Icons.search_off_outlined),
-                          label: Text("Clear"),
+                            onPressed: () => {setState(() => _locationController.text = "")},
+                            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent),),
+                            icon: Icon(Icons.search_off_outlined),
+                            label: Text("Clear"),
                         )
                     ],
                   ),
@@ -457,6 +344,8 @@ class _MapScreenState extends State<MapScreen> {
                           setState(() {
                             _locationController.text = _places[index].name;
                             _selectedLocation = LatLng(_places[index].lat, _places[index].long);
+                            _addMeMarker(_selectedLocation);
+                            _mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _selectedLocation, zoom: zoomLevel)));
                             setState(() {
                               _places = [];
                             });
@@ -515,67 +404,49 @@ class _MapScreenState extends State<MapScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(width: 200, child: ElevatedButton.icon(
-                      onPressed: () => {
-                        getProperties(_selectedLocation),
-                        setState(() => _places = []),
-                      },
-                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.lightBlue)),
-                      icon: Icon(Icons.search),
-                      label: Text("Search"))),
+                        onPressed: () => {
+                          _addMeMarker(_selectedLocation),
+                          getProperties(_selectedLocation),
+                          setState(() => _places = []),
+                        },
+                        style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.lightBlue)),
+                        icon: Icon(Icons.search),
+                        label: Text("Search"))),
                   ],
                 ),
                 SizedBox(height: 10,)
               ]),
             ),
-            Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: ()=>{
-                          _clearPolygon()
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.redAccent),
-                        ),
-                        icon: Icon(Icons.clear),
-                        label: Text("Clear Polygon"),
-                      ),
-                      SizedBox(width: 16),
-                      ElevatedButton.icon(
-                        onPressed: _drawPolygon,
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.green),
-                        ),
-                        icon: Icon(Icons.search),
-                        label: Text("Search By Polygon"),
-                      ),
-                    ],
-                  ),
             Container(
               height: 300,
               color: Colors.white60,
               child: _selectedLocation == null
                   ? const Center(child: CircularProgressIndicator())
                   : GoogleMap(
-                    gestureRecognizers: {
-                      Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer())
-                    },
-                    onMapCreated: _onMapCreated,
-                    initialCameraPosition: CameraPosition(
-                      target: _selectedLocation,
-                      zoom: zoomLevel,
-                      tilt: 45,
-                    ),
-                    mapType: MapType.normal,
-                    markers: _markers,
-                    polygons: _polygons,
-                    onTap: (LatLng point) {
-                      setState(() {
-                        _polygonPoints.add(point);
-                        _updatePolygons();
-                      });
-                    },
+                gestureRecognizers: {
+                  Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer())
+                },
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: _selectedLocation,
+                  zoom: zoomLevel,
+                  tilt: 45,
+                ),
+                mapType: MapType.normal,
+                markers: _markers,
+                onTap: _onMapTapped,
+                circles: {
+                  Circle(
+                    circleId: CircleId('radius'),
+                    center: _selectedLocation,
+                    radius: _radius,
+                    strokeWidth: 2,
+                    strokeColor: Colors.blue,
+                    fillColor: Colors.blue.withOpacity(0.2),
                   ),
+                },
+              ),
+
             ),
             const SizedBox(height: 20),
             Padding(
@@ -596,7 +467,7 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-
+  
   Container _homeDropdown() {
   return Container(
     width: 150,
@@ -678,4 +549,5 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
+
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:Kaeskanest/pages/userNav/propertyAddedSuccess.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,7 @@ class _AddPropertyState extends State<AddProperty> {
         _isFocused = _focusNode.hasFocus;
       });
     });
+    _checkAccessTokenOnce();
   }
   late int userId;
   Future<bool> _checkAccessTokenOnce() async {
@@ -72,11 +74,12 @@ class _AddPropertyState extends State<AddProperty> {
         return false;
       }
       else{
+        print(response.body);
         final Map<String, dynamic> responseData = json.decode(response.body);
         setState(() {
           userId=responseData['id'];
         });
-        print(userId);
+        print("HERE"+userId.toString());
         return true;
       }
     } else {
@@ -89,7 +92,7 @@ class _AddPropertyState extends State<AddProperty> {
       return false;
     }
   }
-  late final Future<bool> _checkAccessTokenFuture = _checkAccessTokenOnce();
+  // late final Future<bool> _checkAccessTokenFuture = _checkAccessTokenOnce();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -622,7 +625,7 @@ class _AddPropertyState extends State<AddProperty> {
                       handleSubmit(_selectedLocation,_locationController.text);
                     }
                   },
-                  child: Text('Submit'),
+                  child: onLoadState?Text('uploading...'):Text('Submit'),
                 ),
 
                 // TextFormField(
@@ -711,21 +714,43 @@ class _AddPropertyState extends State<AddProperty> {
       request.fields['address'] = jsonEncode(address);
       request.fields['details'] = jsonEncode(details);
       // Send the request
-      var response = await request.send();
+      try{
+        var response = await request.send();
+        print(response.reasonPhrase);
+        String sresponse = await response.stream.bytesToString();
+        if (sresponse.contains("id")){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PropertyAddedSuccess(), // Replace with your success screen
+            ),
+          );
+        }else{
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(sresponse.replaceAll("'", "").replaceAll('"', "").replaceAll('[', "").replaceAll(']', "").replaceAll('{', "").replaceAll('}', ""))
+            ),
+          );
+        }
+      }catch (e){
+        print("Error");
+        print(e);
+      }
 
       // Check the response
-      if (response.statusCode <= 300) {
-        print('Form Data Uploaded: ${await response.stream.bytesToString()}');
-      } else {
-        print('Error: ${response.reasonPhrase}');
-        String errorResponse = await response.stream.bytesToString();
-        print('Error: $errorResponse');
-        setState(() {
-          errorController.text = errorResponse;
-        });
-      }
+      // if (response.statusCode <= 300) {
+      //   print('Form Data Uploaded: ${await response.stream.bytesToString()}');
+      // } else {
+      //   print('Error r: ${response.reasonPhrase}');
+      //   String errorResponse = await response.stream.bytesToString();
+      //   print('Error t: $errorResponse');
+      //   print('Error x: ${response}');
+      //   setState(() {
+      //     errorController.text = errorResponse;
+      //   });
+      // }
     } catch (e) {
-      print('Error: $e');
+      print('Error x: $e');
     }
     setState(() {
       onLoadState=false;
