@@ -51,6 +51,7 @@ dependencies:
   chewie: ^1.7.1
   
   dio: ^4.0.0
+  webview_flutter: ^2.0.10
 
 dev_dependencies:
   flutter_test:

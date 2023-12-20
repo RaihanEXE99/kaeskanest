@@ -75,9 +75,11 @@ class _MyAgentsState extends State<MyAgents> {
         }
         else{
           final List<dynamic> gresponseData = json.decode(gresponse.body);
-          setState(() {
-            myAgents =gresponseData;
-          });
+          if(mounted){
+            setState(() {
+              myAgents =gresponseData;
+            });
+          }
           return true;
         }
       }

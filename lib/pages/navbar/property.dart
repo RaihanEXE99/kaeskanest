@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:Kaeskanest/pages/userNav/chat.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -357,10 +358,29 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                           label: Text('Watch Video'),
                         ),
                       ):SizedBox(),
+                      SizedBox(height: 10,),
                     ]),
                   ),
                 ),
-                
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(25,10,25,5),
+                  child: Container(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon:Icon(Icons.chat_rounded,color: Colors.white,),
+                      // style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.blueAccent)),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Chat(chatID: uploadedBy["id"].toString()),
+                            ),
+                          );
+                      },
+                      label: Text('Start a conversation',style: TextStyle(color: Colors.white,fontSize: 14),),
+                    ),
+                  ),
+                ),
                 uploadedBy!=null?Card(
                   margin: EdgeInsets.all(16),
                   child: Column(
@@ -401,6 +421,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                           ),
                         ],
                       ),
+                      
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [

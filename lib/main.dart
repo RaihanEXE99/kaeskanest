@@ -1,3 +1,5 @@
+import 'package:Kaeskanest/pages/userNav/chat.dart';
+import 'package:Kaeskanest/pages/userNav/meet.dart';
 import 'package:flutter/material.dart';
 import 'package:Kaeskanest/pages/home.dart';
 import 'package:Kaeskanest/pages/navbar/about.dart';
@@ -59,7 +61,9 @@ class MyApp extends StatelessWidget {
         "/invitations":(context)=> Invitations(),
         "/about":(context)=> About(),
         "/contact":(context)=> Contact(),
-        "/property":(context)=> PropertyDetails(propertyID: '',),
+        "/property":(context)=> PropertyDetails(propertyID: ''),
+        "/meet":(context)=> Meet(),
+        "/chat":(context)=> Chat(chatID: ''),
       },
     );
   }
