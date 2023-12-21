@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:Kaeskanest/pages/components/appbar.dart';
+import 'package:Kaeskanest/pages/components/navbar.dart';
+import 'package:Kaeskanest/pages/components/userNavbar.dart';
 import 'package:Kaeskanest/pages/navbar/compPropertyCard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -55,7 +58,7 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
   // Set<Marker> _markers = Set();
 
   double _radius = 5 * 1000;
-  double zoomLevel = 11;
+  double zoomLevel = 14;
 
   final TextEditingController _locationController = TextEditingController();
   List<Place> _places = [];
@@ -95,15 +98,15 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
   void _cameFromHomePage() async {
     if (mounted) {
       setState(() {
-        _selectedLocation = LatLng(widget.lat, widget.long);
-        Marker newMarker = Marker(
-          markerId: MarkerId("Current location"),
-          position: _selectedLocation,
-        );
+        // _selectedLocation = LatLng(widget.lat, widget.long);
+        // Marker newMarker = Marker(
+        //   markerId: MarkerId("Current location"),
+        //   position: _selectedLocation,
+        // );
 
         setState(() {
           // _markers.add(newMarker);
-          zoomLevel = calculateZoomLevel(_radius, LatLng(widget.lat, widget.long));
+          zoomLevel = 14;
           _locationController.text = widget.pLocation;
           selectedSaleOption = widget.postType;
           selectedHomeOption = widget.propertyCategory;
@@ -118,12 +121,6 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
     _mapController = controller;
   }
 
-  double calculateZoomLevel(double radius, LatLng center) {
-    double earthRadius = 6371.0;
-    double radiusInRadians = radius / earthRadius;
-    double zoomLevel = 11 - log(radiusInRadians) / log(2);
-    return zoomLevel;
-  }
 
   Future<void> autoCompleteSearch(String input) async {
     final response = await http.get(
@@ -185,13 +182,13 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
       if (mounted) {
         setState(() {
           _selectedLocation = LatLng(position.latitude, position.longitude);
-          Marker newMarker = Marker(
-            markerId: const MarkerId("Current location"),
-            position: _selectedLocation,
-          );
+          // Marker newMarker = Marker(
+          //   markerId: const MarkerId("Current location"),
+          //   position: _selectedLocation,
+          // );
           setState(() {
             // _markers.add(newMarker);
-            zoomLevel = calculateZoomLevel(_radius, LatLng(position.latitude, position.longitude));
+            // zoomLevel = calculateZoomLevel(_radius, LatLng(position.latitude, position.longitude));
           });
           getProperties(_selectedLocation);
         });
@@ -201,17 +198,17 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
 
   Future<void> getProperties(LatLng location) async {
     setState(() {
-      zoomLevel = calculateZoomLevel(_radius, location);
+      // zoomLevel = calculateZoomLevel(_radius, location);
     });
     _clearMarkers();
-    Marker newMarker = Marker(
-      markerId: MarkerId(location.toString()),
-      position: location,
-    );
+    // Marker newMarker = Marker(
+    //   markerId: MarkerId(location.toString()),
+    //   position: location,
+    // );
 
     if (mounted) {
       setState(() {
-        _markers.add(newMarker);
+        // _markers.add(newMarker);
       });
     }
     Future<http.Response> getRecProperties(LatLng location) async {
@@ -238,7 +235,7 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
       if (mounted) {
         setState(() {
           properties = responseData;
-          zoomLevel = calculateZoomLevel(_radius, _selectedLocation);
+          // zoomLevel = calculateZoomLevel(_radius, _selectedLocation);
         });
       }
       for (Map<String, dynamic> item in responseData) {
@@ -406,6 +403,7 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
       _polygonPoints.clear();
       _markers.clear();
       _polygons.clear();
+      properties=[];
     });
   }
 
@@ -417,156 +415,166 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Search Property'),
-      ),
+      drawer: const Navbar(),
+      endDrawer: const UserNavBar(),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: DefaultAppBar(title:"Search Property")
+        ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              color: Theme.of(context).colorScheme.primary,
-              child: Column(children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 15.0, bottom: 1.0, left: 20, right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width / 1.7,
-                        child: TextField(
-                          controller: _locationController,
-                          onChanged: (value) async {
-                            await autoCompleteSearch(value);
-                            setState(() {});
-                          },
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
-                            isDense: true,
-                            hintText: 'Enter a location...',
-                            labelStyle: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.black54,
+        child: Padding(
+          padding: const EdgeInsets.only(top:15),
+          child: Column(
+            children: [
+              Card(
+                color: Theme.of(context).colorScheme.primary,
+                child: Column(children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15.0, bottom: 1.0, left: 20, right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 1.7,
+                          child: TextField(
+                            controller: _locationController,
+                            onChanged: (value) async {
+                              await autoCompleteSearch(value);
+                              setState(() {});
+                            },
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              isDense: true,
+                              hintText: 'Enter a location...',
+                              labelStyle: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black54,
+                              ),
                             ),
                           ),
                         ),
+                        // if (_locationController.text != "")
+                          ElevatedButton.icon(
+                            onPressed: () => {setState(() => _locationController.text = "")},
+                            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent),),
+                            icon: Icon(Icons.search_off_outlined),
+                            label: Text("Clear"),
+                          )
+                      ],
+                    ),
+                  ),
+                  _places.isNotEmpty ? SizedBox(
+                    height: 300,
+                    child: ListView.builder(
+                      itemCount: _places.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(_places[index].name),
+                          subtitle: Text(_places[index].vicinity),
+                          onTap: () {
+                            setState(() {
+                              _locationController.text = _places[index].name;
+                              _selectedLocation = LatLng(_places[index].lat, _places[index].long);
+                              _mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _selectedLocation, zoom: zoomLevel)));
+                              setState(() {
+                                _places = [];
+                              });
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ) : const SizedBox(height: 5,),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _saleDropdown(),
+                        _homeDropdown()
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: ()=>{
+                          _clearMarkersAndPolygon()
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.redAccent),
+                        ),
+                        icon: Icon(Icons.clear),
+                        label: Text("Clear polygon"),
                       ),
-                      if (_locationController.text != "")
-                        ElevatedButton.icon(
-                          onPressed: () => {setState(() => _locationController.text = "")},
-                          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent),),
-                          icon: Icon(Icons.search_off_outlined),
-                          label: Text("Clear"),
-                        )
+                      SizedBox(width: 16),
+                      ElevatedButton.icon(
+                        onPressed: _drawPolygon,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.blueAccent),
+                        ),
+                        icon: Icon(Icons.search),
+                        label: Text("Search By Area"),
+                      ),
                     ],
                   ),
-                ),
-                _places.isNotEmpty ? SizedBox(
+                ]),
+              ),
+          
+              Padding(
+                padding: const EdgeInsets.only(top:8.0),
+                child: Container(
                   height: 300,
-                  child: ListView.builder(
-                    itemCount: _places.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(_places[index].name),
-                        subtitle: Text(_places[index].vicinity),
-                        onTap: () {
+                  color: Colors.white60,
+                  child: _selectedLocation == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : GoogleMap(
+                        gestureRecognizers: {
+                          Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer())
+                        },
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: CameraPosition(
+                          target: _selectedLocation,
+                          zoom: zoomLevel,
+                          tilt: 45,
+                        ),
+                        mapType: MapType.normal,
+                        markers: _markers,
+                        polygons: _polygons,
+                        onTap: (LatLng point) {
                           setState(() {
-                            _locationController.text = _places[index].name;
-                            _selectedLocation = LatLng(_places[index].lat, _places[index].long);
-                            setState(() {
-                              _places = [];
-                            });
+                            _polygonPoints.add(point);
+                            _markers.add(Marker(
+                              markerId: MarkerId(point.toString()),
+                              position: point,
+                              icon: BitmapDescriptor.fromBytes(markerIcon!),
+                            ));
+                            _updatePolygons();
                           });
                         },
+                      ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: properties.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title:  PropertyCard(context,properties[index]),
                       );
                     },
                   ),
-                ) : const SizedBox(height: 5,),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _saleDropdown(),
-                      _homeDropdown()
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: ()=>{
-                        _clearMarkersAndPolygon()
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.redAccent),
-                      ),
-                      icon: Icon(Icons.clear),
-                      label: Text("Clear polygon"),
-                    ),
-                    SizedBox(width: 16),
-                    ElevatedButton.icon(
-                      onPressed: _drawPolygon,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.blueAccent),
-                      ),
-                      icon: Icon(Icons.search),
-                      label: Text("Search By Area"),
-                    ),
-                  ],
-                ),
-              ]),
-            ),
-        
-            Container(
-              height: 300,
-              color: Colors.white60,
-              child: _selectedLocation == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : GoogleMap(
-                    gestureRecognizers: {
-                      Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer())
-                    },
-                    onMapCreated: _onMapCreated,
-                    initialCameraPosition: CameraPosition(
-                      target: _selectedLocation,
-                      zoom: zoomLevel,
-                      tilt: 45,
-                    ),
-                    mapType: MapType.normal,
-                    markers: _markers,
-                    polygons: _polygons,
-                    onTap: (LatLng point) {
-                      setState(() {
-                        _polygonPoints.add(point);
-                        _markers.add(Marker(
-                          markerId: MarkerId(point.toString()),
-                          position: point,
-                          icon: BitmapDescriptor.fromBytes(markerIcon!),
-                        ));
-                        _updatePolygons();
-                      });
-                    },
-                  ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: properties.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title:  PropertyCard(context,properties[index]),
-                    );
-                  },
-                ),
-              )
-          ],
+                )
+            ],
+          ),
         ),
       ),
     );

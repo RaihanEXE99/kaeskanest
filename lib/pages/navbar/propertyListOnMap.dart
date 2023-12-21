@@ -58,7 +58,7 @@ class _MapScreenSearchByMapState extends State<MapScreenSearchByMap> {
   // Set<Marker> _markers = Set();
 
   double _radius = 5 * 1000;
-  double zoomLevel = 11;
+  double zoomLevel = 13;
 
   final TextEditingController _locationController = TextEditingController();
   List<Place> _places = [];
@@ -288,7 +288,7 @@ class _MapScreenSearchByMapState extends State<MapScreenSearchByMap> {
                             ),
                           ),
                         ),
-                        if (_locationController.text != "")
+                        // if (_locationController.text != "")
                           ElevatedButton.icon(
                             onPressed: () => {setState(() => _locationController.text = "")},
                             style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent),),
