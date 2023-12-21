@@ -66,8 +66,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // getLocation();
     _loadProperties();
   }
+  // void getLocation() async {
+  //   LocationPermission permission = await Geolocator.requestPermission();
+  //   Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+  // }
   Future<void> _loadProperties() async {
     final response = await http.get(
       Uri.parse("https://" + globals.apiUrl + '/api/hprop/'),
