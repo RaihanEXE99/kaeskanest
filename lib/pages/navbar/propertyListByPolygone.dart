@@ -13,14 +13,14 @@ import 'dart:ui' as ui;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:Kaeskanest/global.dart' as globals;
 
-class MapScreen extends StatefulWidget {
+class MapScreenSearchByPolygon extends StatefulWidget {
   final double lat;
   final double long;
   final String postType;
   final String propertyCategory;
   final String pLocation;
   final bool initNeed;
-  MapScreen({
+  MapScreenSearchByPolygon({
     required this.lat,
     required this.long,
     required this.postType,
@@ -29,7 +29,7 @@ class MapScreen extends StatefulWidget {
     required this.initNeed,
   });
   @override
-  _MapScreenState createState() => _MapScreenState();
+  _MapScreenStateSearchByPolygon createState() => _MapScreenStateSearchByPolygon();
 }
 
 class Place {
@@ -48,7 +48,7 @@ class Place {
   });
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
   final String apiKey = globals.apiKey;
   late GoogleMapController _mapController;
   var _selectedLocation = LatLng(0, 0);
@@ -493,81 +493,34 @@ class _MapScreenState extends State<MapScreen> {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 40.0, right: 40, top: 10, bottom: 10),
-                  child: Card(
-                    child: Column(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Text("Set Radius", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Selected Value: $sliderValue'),
-                            Slider(
-                              value: sliderValue,
-                              min: 1,
-                              max: 20,
-                              divisions: 19,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  sliderValue = newValue;
-                                  _radius = newValue * 1000;
-                                });
-                                setState(() {
-                                  setState(() => {_places = [], zoomLevel = calculateZoomLevel(_radius, _selectedLocation)});
-                                  _mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _selectedLocation, zoom: zoomLevel)));
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                SizedBox(height: 10,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(width: 200, child: ElevatedButton.icon(
-                      onPressed: () => {
-                        getProperties(_selectedLocation),
-                        setState(() => _places = []),
+                    ElevatedButton.icon(
+                      onPressed: ()=>{
+                        _clearMarkersAndPolygon()
                       },
-                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.lightBlue)),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.redAccent),
+                      ),
+                      icon: Icon(Icons.clear),
+                      label: Text("Clear polygon"),
+                    ),
+                    SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      onPressed: _drawPolygon,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.blueAccent),
+                      ),
                       icon: Icon(Icons.search),
-                      label: Text("Search"))),
+                      label: Text("Search By Area"),
+                    ),
                   ],
                 ),
-                SizedBox(height: 10,)
               ]),
             ),
-            Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: ()=>{
-                          _clearMarkersAndPolygon()
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.redAccent),
-                        ),
-                        icon: Icon(Icons.clear),
-                        label: Text("Clear Polygon"),
-                      ),
-                      SizedBox(width: 16),
-                      ElevatedButton.icon(
-                        onPressed: _drawPolygon,
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.green),
-                        ),
-                        icon: Icon(Icons.search),
-                        label: Text("Search By Area"),
-                      ),
-                    ],
-                  ),
+        
             Container(
               height: 300,
               color: Colors.white60,

@@ -1,3 +1,5 @@
+import 'package:Kaeskanest/pages/navbar/propertyListByPolygone.dart';
+import 'package:Kaeskanest/pages/navbar/propertyListOnMap.dart';
 import 'package:Kaeskanest/pages/userNav/chat.dart';
 import 'package:Kaeskanest/pages/userNav/meet.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +55,8 @@ class MyApp extends StatelessWidget {
         '/register':(context) => Register(),
         '/settings':(context) => Settings(),
         "/propertyList":(context)=> MapScreen(lat: 0, long: 0, postType: '', propertyCategory: '', pLocation: '', initNeed: false),
+        "/propertyListOnMap":(context)=> MapScreenSearchByMap(lat: 0, long: 0, postType: '', propertyCategory: '', pLocation: '', initNeed: false),
+        "/propertyListByPolygon":(context)=> MapScreenSearchByPolygon(lat: 0, long: 0, postType: '', propertyCategory: '', pLocation: '', initNeed: false),
         "/profileSettings":(context)=> ProfileSettings(),
         "/addAgent":(context)=> AddAgent(),
         "/myProperty":(context)=> MyProperty(),

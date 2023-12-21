@@ -59,9 +59,11 @@ class _PropertyDetailsState extends State<PropertyDetails> {
         _propertyDetails['images'].forEach((e) => {
           tList=[...tList,"https://${globals.apiUrl}"+e['image']]
         });
-        setState(() {
-          propertyImages=tList;
-        });
+        if(mounted){
+          setState(() {
+            propertyImages=tList;
+          });
+        }
         final int aid = _propertyDetails['user'];
         final agentResponse = await http.get(
         Uri.parse("https://" + globals.apiUrl + '/api/agentDetails/${aid.toString()}/'),
@@ -70,9 +72,11 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           },
         );
         final Map<String, dynamic> ares = json.decode(agentResponse.body);
-        setState(() {
-          uploadedBy=ares;
-        });
+        if(mounted){
+          setState(() {
+            uploadedBy=ares;
+          });
+        }
         return true;
     }
   late final Future<bool> _checkAccessTokenFuture = _checkAccessTokenOnce();
