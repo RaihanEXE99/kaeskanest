@@ -121,7 +121,7 @@ class _MapScreenState extends State<MapScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(Icons.polyline,size: 85),
-                    Text("SEARCH BY AREA",style: TextStyle(fontSize: 25),),
+                    Text("DRAW YOUR AREA",style: TextStyle(fontSize: 25),),
                   ],
                 ))
               ),

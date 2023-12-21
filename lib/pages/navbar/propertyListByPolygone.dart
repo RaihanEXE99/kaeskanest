@@ -509,7 +509,7 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
                           backgroundColor: MaterialStateProperty.all(Colors.redAccent),
                         ),
                         icon: Icon(Icons.clear),
-                        label: Text("Clear polygon"),
+                        label: Text("Clear drawing"),
                       ),
                       SizedBox(width: 16),
                       ElevatedButton.icon(
@@ -518,7 +518,7 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
                           backgroundColor: MaterialStateProperty.all(Colors.blueAccent),
                         ),
                         icon: Icon(Icons.search),
-                        label: Text("Search By Area"),
+                        label: Text("Draw Your Area"),
                       ),
                     ],
                   ),
