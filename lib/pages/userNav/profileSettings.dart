@@ -69,13 +69,6 @@ class _ProfileSettingsState extends State<ProfileSettings> {
       }
       else{
         final Map<String, dynamic> responseData = json.decode(response.body);
-        // final gresponse = await http.get(
-        // Uri.parse("https://" + globals.apiUrl + '/api/profiles/'+responseData['id'].toString()+'/'),
-        //   headers: <String, String>{
-        //     'Content-Type': 'application/json; charset=UTF-8',
-        //     'Authorization': 'JWT $token',
-        //   },
-        // );
         Future<http.Response> fetchProfileData(String token) async {
           final url = Uri.parse("https://" + globals.apiUrl + '/api/profile/details/');
           final headers = {

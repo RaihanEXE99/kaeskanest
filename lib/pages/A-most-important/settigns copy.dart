@@ -158,56 +158,56 @@ class _SettingsState extends State<Settings> {
                       ),
                     ),
                   ), 
-                  // Card(
-                  //   margin: EdgeInsets.only(left:30,right: 30,top:10),
-                  //    child: Center(
-                  //     child: Column(
-                  //       mainAxisAlignment: MainAxisAlignment.center,
-                  //       children: <Widget>[
-                  //         _image == null
-                  //             ? Padding(
-                  //               padding: const EdgeInsets.only(top:15),
-                  //               child: Text('No image selected.'),
-                  //             )
-                  //             : Image.file(
-                  //                 _image!,
-                  //                 height: 100,
-                  //                 width: 100,
-                  //               ),
-                  //         SizedBox(height: 5),
-                  //         Row(
-                  //           mainAxisAlignment: MainAxisAlignment.center,
-                  //           children: [
-                  //             ElevatedButton(
-                  //               onPressed: getImage,
-                  //               style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.black)),
-                  //               child: Text('Pick Image'),
-                  //             ),
-                  //             if (_image != null)Padding(
-                  //               padding: const EdgeInsets.only(left:8.0),
-                  //               child: ElevatedButton(
-                  //                 style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent)),
-                  //                 onPressed: ()=>{
-                  //                   setState(() {
-                  //                     _image = null;
-                  //                   })
-                  //                 },
-                  //                 child: Text('Clear'),
-                  //               ),
-                  //             )
-                  //           ],
-                  //         ),
-                  //         SizedBox(height: 10),
-                  //         loadState?Center(child: CircularProgressIndicator()):ElevatedButton(
-                  //           onPressed: updateProfilePicture,
-                  //           style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.black)),
-                  //           child: Text('Update Profile Picture'),
-                  //         ),
-                  //         SizedBox(height: 10),
-                  //       ],
-                  //     ),
-                  //                    ),
-                  //  ),
+                  Card(
+                    margin: EdgeInsets.only(left:30,right: 30,top:10),
+                     child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          _image == null
+                              ? Padding(
+                                padding: const EdgeInsets.only(top:15),
+                                child: Text('No image selected.'),
+                              )
+                              : Image.file(
+                                  _image!,
+                                  height: 100,
+                                  width: 100,
+                                ),
+                          SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: getImage,
+                                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.black)),
+                                child: Text('Pick Image'),
+                              ),
+                              if (_image != null)Padding(
+                                padding: const EdgeInsets.only(left:8.0),
+                                child: ElevatedButton(
+                                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent)),
+                                  onPressed: ()=>{
+                                    setState(() {
+                                      _image = null;
+                                    })
+                                  },
+                                  child: Text('Clear'),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          loadState?Center(child: CircularProgressIndicator()):ElevatedButton(
+                            onPressed: updateProfilePicture,
+                            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.black)),
+                            child: Text('Update Profile Picture'),
+                          ),
+                          SizedBox(height: 10),
+                        ],
+                      ),
+                                     ),
+                   ),
                   
                   Padding(
                     padding: const EdgeInsets.only(left:20,right: 20,top:20),
