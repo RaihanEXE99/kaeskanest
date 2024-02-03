@@ -97,7 +97,11 @@ class _MapScreenStateSearchByPolygon extends State<MapScreenSearchByPolygon> {
 
   void _cameFromHomePage() async {
     if (mounted) {
+    final tmpImg = await getBytesFromAsset('assets/icons/bdot.png', 25);
       setState(() {
+        setState(() {
+        markerIcon = tmpImg;
+      });
         // _selectedLocation = LatLng(widget.lat, widget.long);
         // Marker newMarker = Marker(
         //   markerId: MarkerId("Current location"),

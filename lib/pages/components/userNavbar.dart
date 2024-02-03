@@ -155,16 +155,16 @@ void _updateStateWithUserData(Map<String, dynamic> responseData) {
             },
           )]
         else...[
-          ListTile(
-              leading: Icon(
-                Icons.chat_outlined,
-                color: Colors.black87,
-                ),
-              title: const Text('Conversations'),
-              onTap: ()=> {
-                Navigator.pushNamed(context, "/meet")
-              },
-            ),
+          // ListTile(
+          //     leading: Icon(
+          //       Icons.chat_outlined,
+          //       color: Colors.black87,
+          //       ),
+          //     title: const Text('Conversations'),
+          //     onTap: ()=> {
+          //       Navigator.pushNamed(context, "/meet")
+          //     },
+          //   ),
           ListTile(
             leading: Icon(
               Icons.settings_outlined,
